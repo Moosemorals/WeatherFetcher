@@ -23,7 +23,6 @@
  */
 package com.moosemorals.weather.xml;
 
-import com.fluffypeople.library.xml.BaseParser;
 import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.Forecast;
@@ -41,8 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Parse XML weather data from worldweatheronline.com API v2.
  *
- * @author osric
+ * @author Osric Wilkinson osric@fluffypeople.com
  */
 public class WeatherParser extends BaseParser<WeatherReport> {
 

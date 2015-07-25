@@ -155,8 +155,6 @@ public class WeatherParserTest {
 
         assertEquals(expected, result);
 
-        log.debug("For +1, time is {}", result);
-
     }
 
     @Test
@@ -175,7 +173,6 @@ public class WeatherParserTest {
         DateTime expected = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHours(-1));
 
         assertEquals(expected, result);
-        log.debug("For -1, time is {}", result);
     }
 
     @Test
@@ -194,7 +191,6 @@ public class WeatherParserTest {
         DateTime expected = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHoursMinutes(0, 30));
 
         assertEquals(expected, result);
-        log.debug("For +0.5, time is {}", result);
     }
 
     @Test
@@ -213,7 +209,6 @@ public class WeatherParserTest {
         DateTime expected = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHoursMinutes(0, -30));
 
         assertEquals(expected, result);
-        log.debug("For -0.5, time is {}", result);
     }
 
     private static InputStream getInput(String source) throws UnsupportedEncodingException {

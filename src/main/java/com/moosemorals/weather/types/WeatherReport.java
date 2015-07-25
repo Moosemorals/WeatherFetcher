@@ -28,8 +28,9 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 /**
+ * Weather for a time and location.
  *
- * @author osric
+ * @author Osric Wilkinson osric@fluffypeople.com
  */
 public class WeatherReport {
 
@@ -41,6 +42,11 @@ public class WeatherReport {
         forecast = new ArrayList<>();
     }
 
+    /**
+     * Current weather.
+     *
+     * @return Current weather
+     */
     public Current getCurrent() {
         return current;
     }
