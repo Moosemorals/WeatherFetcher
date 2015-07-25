@@ -23,13 +23,15 @@
  */
 package com.moosemorals.weather.types;
 
+import org.joda.time.LocalTime;
+
 /**
  *
  * @author osric
  */
 public class Hour {
 
-    private final long time;
+    private final LocalTime time;
     private final int tempC;
     private final int tempF;
     private final int windspeedMiles;
@@ -70,7 +72,7 @@ public class Hour {
     private final int chanceOfRemdry;
     private final int chanceOfHightemp;
 
-    public long getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
@@ -230,7 +232,7 @@ public class Hour {
         return chanceOfHightemp;
     }
 
-    protected Hour(long time, int tempC, int tempF, int windspeedMiles, int windspeedKPH, int windspeedKnots, int windspeedMPS, int winddirDegree, String winddir16Point, int weatherCode, String weatherDesc, String weatherIconUrl, float precipMM, float precipInches, int humidity, int visibility, int VisiblityMiles, int pressureMb, int pressureInches, int cloudcover, int heatIndexC, int heatIndexF, int dewPointC, int dewPointF, int windChillC, int windChillF, int windGustMiles, int windGustKmph, int feelsLikeC, int feelsLikeF, int chanceOfRain, int chanceOfWindy, int chanceOfOvercast, int chanceOfSunny, int chanceOfFrost, int chanceOfFog, int chanceofSnow, int chanceOfThunder, int chanceOfRemdry, int chanceOfHightemp) {
+    protected Hour(LocalTime time, int tempC, int tempF, int windspeedMiles, int windspeedKPH, int windspeedKnots, int windspeedMPS, int winddirDegree, String winddir16Point, int weatherCode, String weatherDesc, String weatherIconUrl, float precipMM, float precipInches, int humidity, int visibility, int VisiblityMiles, int pressureMb, int pressureInches, int cloudcover, int heatIndexC, int heatIndexF, int dewPointC, int dewPointF, int windChillC, int windChillF, int windGustMiles, int windGustKmph, int feelsLikeC, int feelsLikeF, int chanceOfRain, int chanceOfWindy, int chanceOfOvercast, int chanceOfSunny, int chanceOfFrost, int chanceOfFog, int chanceofSnow, int chanceOfThunder, int chanceOfRemdry, int chanceOfHightemp) {
         this.time = time;
         this.tempC = tempC;
         this.tempF = tempF;
@@ -275,7 +277,7 @@ public class Hour {
 
     public static class Builder {
 
-        private long time;
+        private LocalTime time;
         private int tempC;
         private int tempF;
         private int windspeedMiles;
@@ -320,7 +322,7 @@ public class Hour {
             super();
         }
 
-        public Builder setTime(long time) {
+        public Builder setTime(LocalTime time) {
             this.time = time;
             return this;
         }

@@ -32,6 +32,7 @@ import com.moosemorals.weather.types.WeatherReport;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -103,7 +104,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                 case "weatherDesc":
                     builder.setWeatherDesc(readTag(parser, "weatherDesc").trim());
                     break;
-                case "windspeadMiles":
+                case "windspeedMiles":
                     builder.setWindspeedMPH(readIntTag(parser, "windspeedMiles"));
                     break;
                 case "windspeedKmph":
@@ -130,11 +131,11 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                 case "cloudcover":
                     builder.setCloudcover(readIntTag(parser, "cloudcover"));
                     break;
-                case "feelsLikeC":
-                    builder.setFeelsLikeC(readIntTag(parser, "feelsLikeC"));
+                case "FeelsLikeC":
+                    builder.setFeelsLikeC(readIntTag(parser, "FeelsLikeC"));
                     break;
-                case "feelsLikeF":
-                    builder.setFeelsLikeF(readIntTag(parser, "feelsLikeF"));
+                case "FeelsLikeF":
+                    builder.setFeelsLikeF(readIntTag(parser, "FeelsLikeF"));
                     break;
                 default:
                     log.warn("Current: Skiping unexpected tag {}", parser.getLocalName());
@@ -256,8 +257,6 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
         Hour.Builder builder = new Hour.Builder();
 
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("KK:mm a");
-
         while (parser.next() != XMLStreamReader.END_ELEMENT) {
             if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {
                 continue;
@@ -265,7 +264,18 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
             switch (parser.getLocalName()) {
                 case "time":
-                    skipTag(parser);
+                    String raw = readTag(parser, "time");
+                    if (raw.equals("0")) {
+                        builder.setTime(new LocalTime(0, 0));
+                    } else {
+                        String hour = raw.substring(0, raw.length() - 2);
+                        String minute = raw.substring(raw.length() - 2);
+                        try {
+                            builder.setTime(new LocalTime(Integer.parseInt(hour, 10), Integer.parseInt(minute, 10)));
+                        } catch (NumberFormatException ex) {
+                            throw new XMLStreamException("Can't parse time: " + ex.getMessage(), ex);
+                        }
+                    }
                     break;
                 case "tempC":
                     builder.setTempC(readIntTag(parser, "tempC"));
@@ -310,7 +320,35 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     builder.setCloudcover(readIntTag(parser, "cloudcover"));
                     break;
                 case "HeatIndexC":
-
+                    builder.setHeatIndexC(readIntTag(parser, "HeatIndexC"));
+                    break;
+                case "HeatIndexF":
+                    builder.setHeatIndexF(readIntTag(parser, "HeatIndexF"));
+                    break;
+                case "DewPointC":
+                    builder.setDewPointC(readIntTag(parser, "DewPointC"));
+                    break;
+                case "DewPointF":
+                    builder.setDewPointF(readIntTag(parser, "DewPointF"));
+                    break;
+                case "WindChillC":
+                    builder.setWindChillC(readIntTag(parser, "WindChillC"));
+                    break;
+                case "WindChillF":
+                    builder.setWindChillF(readIntTag(parser, "WindChillF"));
+                    break;
+                case "WindGustMiles":
+                    builder.setWindGustMiles(readIntTag(parser, "WindGustMiles"));
+                    break;
+                case "WindGustKmph":
+                    builder.setWindGustKmph(readIntTag(parser, "WindGustKmph"));
+                    break;
+                case "FeelsLikeC":
+                    builder.setFeelsLikeC(readIntTag(parser, "FeelsLikeC"));
+                    break;
+                case "FeelsLikeF":
+                    builder.setFeelsLikeF(readIntTag(parser, "FeelsLikeF"));
+                    break;
                 case "chanceofrain":
                     builder.setChanceOfRain(readIntTag(parser, "chanceofrain"));
                     break;
@@ -319,6 +357,15 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     break;
                 case "chanceofovercast":
                     builder.setChanceOfOvercast(readIntTag(parser, "chanceofovercast"));
+                    break;
+                case "chanceofremdry":
+                    builder.setChanceOfRemdry(readIntTag(parser, "chanceofremdry"));
+                    break;
+                case "chanceofhightemp":
+                    builder.setChanceOfHightemp(readIntTag(parser, "chanceofhightemp"));
+                    break;
+                case "chanceofsnow":
+                    builder.setChanceofSnow(readIntTag(parser, "chanceofsnow"));
                     break;
                 case "chanceofsunshine":
                     builder.setChanceOfSunny(readIntTag(parser, "chanceofsunshine"));

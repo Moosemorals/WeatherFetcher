@@ -99,6 +99,26 @@ public class WeatherParserTest {
         assertEquals(hour.getTempC(), 11);
         assertEquals(hour.getTempF(), 51);
         assertEquals(hour.getWindspeedMiles(), 7);
+        assertEquals(hour.getWinddirDegree(), 254);
+        assertEquals(hour.getWeatherCode(), 113);
+        assertEquals(hour.getWeatherIconUrl(), "http://cdn.worldweatheronline.net/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png");
+        assertEquals(hour.getWeatherDesc(), "Clear");
+        assertEquals(hour.getPrecipMM(), 0.0, 0.001);
+        assertEquals(hour.getHumidity(), 85);
+        assertEquals(hour.getVisibility(), 10);
+        assertEquals(hour.getPressureMb(), 1014);
+        assertEquals(hour.getCloudcover(), 17);
+
+        assertEquals(hour.getHeatIndexC(), 11);
+        assertEquals(hour.getHeatIndexF(), 51);
+        assertEquals(hour.getDewPointC(), 8);
+        assertEquals(hour.getDewPointF(), 46);
+        assertEquals(hour.getWindChillC(), 9);
+        assertEquals(hour.getWindChillF(), 48);
+        assertEquals(hour.getWindGustMiles(), 13);
+        assertEquals(hour.getWindGustKmph(), 21);
+        assertEquals(hour.getFeelsLikeC(), 9);
+        assertEquals(hour.getFeelsLikeF(), 48);
 
     }
 
