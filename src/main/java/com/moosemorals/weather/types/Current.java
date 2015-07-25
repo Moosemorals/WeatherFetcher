@@ -48,8 +48,10 @@ public class Current {
     private final int pressureMb;
     private final int pressureInches;
     private final int cloudcover;
+    private final int feelsLikeC;
+    private final int feelsLikeF;
 
-    private Current(LocalTime observationTime, int tempC, int tempF, int windspeedMPH, int windspeedKPH, int winddirDegree, String winddirName, int weatherCode, String weatherIconUrl, String weatherDesc, float precipMM, int humidity, int visibilityKm, int visibilityMiles, int pressureMb, int pressureInches, int cloudcover) {
+    private Current(LocalTime observationTime, int tempC, int tempF, int windspeedMPH, int windspeedKPH, int winddirDegree, String winddirName, int weatherCode, String weatherIconUrl, String weatherDesc, float precipMM, int humidity, int visibilityKm, int visibilityMiles, int pressureMb, int pressureInches, int cloudcover, int feelsLikeC, int feelsLikeF) {
         this.observationTime = observationTime;
         this.tempC = tempC;
         this.tempF = tempF;
@@ -67,6 +69,8 @@ public class Current {
         this.pressureMb = pressureMb;
         this.pressureInches = pressureInches;
         this.cloudcover = cloudcover;
+        this.feelsLikeC = feelsLikeC;
+        this.feelsLikeF = feelsLikeF;
     }
 
     public LocalTime getObservationTime() {
@@ -156,6 +160,8 @@ public class Current {
         private int pressureMb;
         private int pressureInches;
         private int cloudcover;
+        private int feelsLikeC;
+        private int feelsLikeF;
 
         public Builder() {
             super();
@@ -246,8 +252,18 @@ public class Current {
             return this;
         }
 
+        public Builder setFeelsLikeC(int feelsLikeC) {
+            this.feelsLikeC = feelsLikeC;
+            return this;
+        }
+
+        public Builder setFeelsLikeF(int feelsLikeF) {
+            this.feelsLikeF = feelsLikeF;
+            return this;
+        }
+
         public Current build() {
-            return new Current(observationTime, tempC, tempF, windspeedMPH, windspeedKPH, winddirDegree, winddirName, weatherCode, weatherIconUrl, weatherDesc, precipMM, humidity, visibilityKm, visibilityMiles, pressureMb, pressureInches, cloudcover);
+            return new Current(observationTime, tempC, tempF, windspeedMPH, windspeedKPH, winddirDegree, winddirName, weatherCode, weatherIconUrl, weatherDesc, precipMM, humidity, visibilityKm, visibilityMiles, pressureMb, pressureInches, cloudcover, feelsLikeC, feelsLikeF);
         }
     }
 

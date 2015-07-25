@@ -130,6 +130,12 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                 case "cloudcover":
                     builder.setCloudcover(readIntTag(parser, "cloudcover"));
                     break;
+                case "feelsLikeC":
+                    builder.setFeelsLikeC(readIntTag(parser, "feelsLikeC"));
+                    break;
+                case "feelsLikeF":
+                    builder.setFeelsLikeF(readIntTag(parser, "feelsLikeF"));
+                    break;
                 default:
                     log.warn("Current: Skiping unexpected tag {}", parser.getLocalName());
                     skipTag(parser);
@@ -303,6 +309,8 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                 case "cloudcover":
                     builder.setCloudcover(readIntTag(parser, "cloudcover"));
                     break;
+                case "HeatIndexC":
+
                 case "chanceofrain":
                     builder.setChanceOfRain(readIntTag(parser, "chanceofrain"));
                     break;
