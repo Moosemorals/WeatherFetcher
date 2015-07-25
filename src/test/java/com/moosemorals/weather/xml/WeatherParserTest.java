@@ -28,8 +28,17 @@ import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.Forecast;
 import com.moosemorals.weather.types.Hour;
 import com.moosemorals.weather.types.WeatherReport;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNotNull;
@@ -41,6 +50,8 @@ import org.testng.annotations.Test;
  */
 public class WeatherParserTest {
 
+    private final Logger log = LoggerFactory.getLogger(WeatherParserTest.class);
+
     public WeatherParserTest() {
     }
 
@@ -51,6 +62,10 @@ public class WeatherParserTest {
         assertNotNull(report);
         assertNotNull(report.getCurrent());
         assertNotEquals(0, report.getForecasts().size());
+
+        DateTime when = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHours(1));
+
+        assertEquals(report.getLocalTime(), when);
 
         Current current = report.getCurrent();
 
@@ -120,6 +135,89 @@ public class WeatherParserTest {
         assertEquals(hour.getFeelsLikeC(), 9);
         assertEquals(hour.getFeelsLikeF(), 48);
 
+    }
+
+    @Test
+    public void readTimeZonePlus1() throws Exception {
+        InputStream in = getInput("<?xml version=\"1.0\"?><time_zone>\n"
+                + "        <localtime>2015-07-24 07:26</localtime>\n"
+                + "        <utcOffset>1.0</utcOffset>\n"
+                + "    </time_zone>");
+
+        XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(in, "UTF-8");
+        reader.nextTag();
+
+        WeatherParser parser = new WeatherParser();
+
+        DateTime result = parser.readTimeZone(reader);
+
+        DateTime expected = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHours(1));
+
+        assertEquals(expected, result);
+
+        log.debug("For +1, time is {}", result);
+
+    }
+
+    @Test
+    public void readTimeZoneMinus1() throws Exception {
+        InputStream in = getInput("<?xml version=\"1.0\"?><time_zone>\n"
+                + "        <localtime>2015-07-24 07:26</localtime>\n"
+                + "        <utcOffset>-1.0</utcOffset>\n"
+                + "    </time_zone>");
+
+        XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(in, "UTF-8");
+        reader.nextTag();
+
+        WeatherParser parser = new WeatherParser();
+
+        DateTime result = parser.readTimeZone(reader);
+        DateTime expected = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHours(-1));
+
+        assertEquals(expected, result);
+        log.debug("For -1, time is {}", result);
+    }
+
+    @Test
+    public void readTimeZonePlusHalf() throws Exception {
+        InputStream in = getInput("<?xml version=\"1.0\"?><time_zone>\n"
+                + "        <localtime>2015-07-24 07:26</localtime>\n"
+                + "        <utcOffset>0.5</utcOffset>\n"
+                + "    </time_zone>");
+
+        XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(in, "UTF-8");
+        reader.nextTag();
+
+        WeatherParser parser = new WeatherParser();
+
+        DateTime result = parser.readTimeZone(reader);
+        DateTime expected = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHoursMinutes(0, 30));
+
+        assertEquals(expected, result);
+        log.debug("For +0.5, time is {}", result);
+    }
+
+    @Test
+    public void readTimeZoneMinusHalf() throws Exception {
+        InputStream in = getInput("<?xml version=\"1.0\"?><time_zone>\n"
+                + "        <localtime>2015-07-24 07:26</localtime>\n"
+                + "        <utcOffset>-0.5</utcOffset>\n"
+                + "    </time_zone>");
+
+        XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(in, "UTF-8");
+        reader.nextTag();
+
+        WeatherParser parser = new WeatherParser();
+
+        DateTime result = parser.readTimeZone(reader);
+        DateTime expected = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHoursMinutes(0, -30));
+
+        assertEquals(expected, result);
+        log.debug("For -0.5, time is {}", result);
+    }
+
+    private static InputStream getInput(String source) throws UnsupportedEncodingException {
+        return new ByteArrayInputStream(source.getBytes("UTF-8"));
     }
 
 }

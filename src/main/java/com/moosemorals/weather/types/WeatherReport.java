@@ -25,6 +25,7 @@ package com.moosemorals.weather.types;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -33,6 +34,7 @@ import java.util.List;
 public class WeatherReport {
 
     private Current current;
+    private DateTime when;
     private final List<Forecast> forecast;
 
     public WeatherReport() {
@@ -53,6 +55,14 @@ public class WeatherReport {
 
     public List<Forecast> getForecasts() {
         return forecast;
+    }
+
+    public DateTime getLocalTime() {
+        return when;
+    }
+
+    public void setLocalTime(DateTime when) {
+        this.when = when;
     }
 
 }

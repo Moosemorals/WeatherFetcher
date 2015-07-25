@@ -32,6 +32,8 @@ import com.moosemorals.weather.types.WeatherReport;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -63,6 +65,9 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     break;
                 case "weather":
                     report.addForecast(readForecast(parser));
+                    break;
+                case "time_zone":
+                    report.setLocalTime(readTimeZone(parser));
                     break;
                 default:
                     log.warn("Top: Skiping unexpected tag {}", parser.getLocalName());
@@ -387,5 +392,35 @@ public class WeatherParser extends BaseParser<WeatherReport> {
         }
 
         return builder.build();
+    }
+
+    protected DateTime readTimeZone(XMLStreamReader parser) throws XMLStreamException, IOException {
+        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "time_zone");
+
+        String rawDate = null;
+        float utcOffset = 0.0f;
+
+        while (parser.next() != XMLStreamReader.END_ELEMENT) {
+            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {
+                continue;
+            }
+
+            String raw;
+            switch (parser.getLocalName()) {
+                case "localtime":
+                    rawDate = readTag(parser, "localtime");
+                    break;
+                case "utcOffset":
+                    utcOffset = readFloatTag(parser, "utcOffset");
+                    break;
+            }
+        }
+
+        int hoursOffset = (int) utcOffset;
+        int minutesOffset = (int) ((utcOffset - hoursOffset) * 60.0);
+
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm").withZone(DateTimeZone.forOffsetHoursMinutes(hoursOffset, minutesOffset));
+
+        return fmt.parseDateTime(rawDate);
     }
 }
