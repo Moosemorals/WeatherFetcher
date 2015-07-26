@@ -25,6 +25,7 @@ package com.moosemorals.weather.xml;
 
 import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
+import com.moosemorals.weather.types.ErrorReport;
 import com.moosemorals.weather.types.Forecast;
 import com.moosemorals.weather.types.Hour;
 import com.moosemorals.weather.types.WeatherReport;
@@ -60,6 +61,9 @@ public class WeatherParser extends BaseParser<WeatherReport> {
             }
 
             switch (parser.getLocalName()) {
+                case "error":
+                    report.setError(readError(parser));
+                    break;
                 case "current_condition":
                     report.setCurrent(readCurrent(parser));
                     break;
@@ -429,6 +433,15 @@ public class WeatherParser extends BaseParser<WeatherReport> {
         return fmt.parseDateTime(rawDate);
     }
 
+    private ErrorReport readError(XMLStreamReader parser) throws XMLStreamException, IOException {
+        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "error");
+
+        while (parser.next() != XMLStreamReader.START_ELEMENT) {
+            // skip noise
+        }
+        return new ErrorReport("APIError", readTag(parser, "msg"));
+    }
+
     private static LocalTime readTime(String raw) throws XMLStreamException {
         if (raw.equals("0")) {
             return new LocalTime(0, 0);
@@ -442,4 +455,5 @@ public class WeatherParser extends BaseParser<WeatherReport> {
             }
         }
     }
+
 }

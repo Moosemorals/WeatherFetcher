@@ -150,6 +150,16 @@ public class WeatherParserNGTest {
     }
 
     @Test
+    public void parse_error() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/error-bad-location.xml"));
+
+        assertEquals(report.isSuccess(), false, "Report is not a success");
+        assertNotNull(report.getError(), "ErrorReport should not be null");
+        assertEquals(report.getError().getMessage(), "Unable to find any matching weather location to the query submitted!", "Unexpected error message");
+
+    }
+
+    @Test
     public void readTimeZonePlus1() throws Exception {
         InputStream in = getInput("<?xml version=\"1.0\"?><time_zone>\n"
                 + "        <localtime>2015-07-24 07:26</localtime>\n"

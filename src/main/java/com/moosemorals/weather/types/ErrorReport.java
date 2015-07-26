@@ -27,12 +27,12 @@ package com.moosemorals.weather.types;
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
-public class ErrorResponse {
+public class ErrorReport {
 
     private final String type;
     private final String message;
 
-    public ErrorResponse(String type, String message) {
+    public ErrorReport(String type, String message) {
 
         this.type = type;
         this.message = message;

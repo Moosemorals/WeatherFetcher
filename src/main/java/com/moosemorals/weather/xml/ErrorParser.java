@@ -23,7 +23,7 @@
  */
 package com.moosemorals.weather.xml;
 
-import com.moosemorals.weather.types.ErrorResponse;
+import com.moosemorals.weather.types.ErrorReport;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -34,12 +34,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
-public class ErrorParser extends BaseParser<ErrorResponse> {
+public class ErrorParser extends BaseParser<ErrorReport> {
 
     private final Logger log = LoggerFactory.getLogger(ErrorParser.class);
 
     @Override
-    public ErrorResponse parse(XMLStreamReader parser) throws XMLStreamException, IOException {
+    public ErrorReport parse(XMLStreamReader parser) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "error");
 
         String type = null, message = null;
@@ -61,7 +61,7 @@ public class ErrorParser extends BaseParser<ErrorResponse> {
                     break;
             }
         }
-        return new ErrorResponse(type, message);
+        return new ErrorReport(type, message);
     }
 
 }

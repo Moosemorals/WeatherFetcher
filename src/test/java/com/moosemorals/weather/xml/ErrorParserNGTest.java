@@ -23,7 +23,7 @@
  */
 package com.moosemorals.weather.xml;
 
-import com.moosemorals.weather.types.ErrorResponse;
+import com.moosemorals.weather.types.ErrorReport;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
@@ -36,7 +36,7 @@ public class ErrorParserNGTest {
     @Test
     public void basic_parse() throws Exception {
 
-        ErrorResponse result = new ErrorParser().parse(getClass().getResourceAsStream("/error-no-key.xml"));
+        ErrorReport result = new ErrorParser().parse(getClass().getResourceAsStream("/error-no-key.xml"));
 
         assertEquals(result.getType(), "KeyError");
         assertEquals(result.getMessage(), "No api_key specified.");

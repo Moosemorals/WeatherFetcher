@@ -23,7 +23,7 @@
  */
 package com.moosemorals.weather;
 
-import com.moosemorals.weather.types.ErrorResponse;
+import com.moosemorals.weather.types.ErrorReport;
 import com.moosemorals.weather.types.FetchResult;
 import com.moosemorals.weather.xml.ErrorParser;
 import com.moosemorals.weather.xml.WeatherParser;
@@ -152,7 +152,7 @@ public class Fetcher {
                 if (status.getStatusCode() == 200) {
                     return new FetchResult(new WeatherParser().parse(dumpInputStream(body.getContent())), requestsPerSecond, requestsPerDay);
                 } else {
-                    ErrorResponse error = new ErrorParser().parse(body.getContent());
+                    ErrorReport error = new ErrorParser().parse(body.getContent());
                     throw new IOException("Could not fetch result from [" + loggableTarget + "]: " + error.getType() + ": " + error.getMessage());
                 }
             } finally {

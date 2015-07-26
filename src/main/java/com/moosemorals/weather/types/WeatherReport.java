@@ -37,16 +37,24 @@ public class WeatherReport {
     private Current current;
     private DateTime when;
     private final List<Forecast> forecast;
+    private ErrorReport error;
 
     public WeatherReport() {
         forecast = new ArrayList<>();
     }
 
-    /**
-     * Current weather.
-     *
-     * @return Current weather
-     */
+    public ErrorReport getError() {
+        return error;
+    }
+
+    public void setError(ErrorReport error) {
+        this.error = error;
+    }
+
+    public boolean isSuccess() {
+        return error == null;
+    }
+
     public Current getCurrent() {
         return current;
     }
