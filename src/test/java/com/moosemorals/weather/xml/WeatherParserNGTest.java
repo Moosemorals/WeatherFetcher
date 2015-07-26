@@ -57,22 +57,30 @@ public class WeatherParserNGTest {
     }
 
     @Test
-    public void parse_utc() throws Exception {
+    public void basics() throws Exception {
         WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
 
         assertNotNull(report);
         assertNotNull(report.getCurrent());
-        assertNotEquals(0, report.getForecasts().size());
-
+        assertNotEquals(report.getForecasts().size(), 3);
         DateTime when = new DateTime(2015, 7, 25, 11, 01, 0, DateTimeZone.forOffsetHours(1));
 
         assertEquals(report.getLocalTime(), when);
+    }
+
+    @Test
+    public void location() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
 
         Location location = report.getLocation();
         assertNotNull(location);
         assertEquals(location.getType(), "UK Postcode");
         assertEquals(location.getName(), "NE6");
+    }
 
+    @Test
+    public void current() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
         Current current = report.getCurrent();
 
         assertEquals(current.getObservationTime(), new LocalTime(10, 01));
@@ -95,6 +103,12 @@ public class WeatherParserNGTest {
 
         assertEquals(current.getCloudcover(), 50);
 
+    }
+
+    @Test
+    public void forecasts() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
         Forecast forecast = report.getForecasts().get(0);
 
         assertEquals(forecast.getDate(), new LocalDate(2015, 7, 25));
@@ -104,6 +118,13 @@ public class WeatherParserNGTest {
         assertEquals(forecast.getMinTempC(), 9);
         assertEquals(forecast.getMinTempF(), 48);
         assertEquals(forecast.getUvIndex(), 5);
+    }
+
+    @Test
+    public void astronomy() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        Forecast forecast = report.getForecasts().get(0);
 
         Astronomy astronomy = forecast.getAstronomy();
         assertNotNull(astronomy);
@@ -112,6 +133,13 @@ public class WeatherParserNGTest {
         assertEquals(astronomy.getSunset(), new LocalTime(21, 22));
         assertEquals(astronomy.getMoonrise(), new LocalTime(15, 26));
         assertEquals(astronomy.getMoonset(), new LocalTime(0, 22));
+    }
+
+    @Test
+    public void hourly() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        Forecast forecast = report.getForecasts().get(0);
 
         assertEquals(forecast.getHourly().size(), 8);
 
