@@ -32,6 +32,6 @@ does nothing to enforce those limits, but does report your usage.
 
 # Licence
 
-My code is under the MIT licence. Use of the API data is covered by their 
+My code is under the [MIT licence](LICENCE). Use of the API data is covered by their 
 [terms and conditions](http://www.worldweatheronline.com/api/free-api-terms.aspx)
 and requires a link back to their site.
