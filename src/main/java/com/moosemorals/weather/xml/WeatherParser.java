@@ -82,7 +82,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "current_condition");
 
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("hh:mm aa");
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("hh:mm aa").withZoneUTC();
         Current.Builder builder = new Current.Builder();
 
         while (parser.next() != XMLStreamReader.END_ELEMENT) {
@@ -262,6 +262,9 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
         Hour.Builder builder = new Hour.Builder();
 
+        LocalTime utcTime = null;
+        DateTime utcDate = null;
+
         while (parser.next() != XMLStreamReader.END_ELEMENT) {
             if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {
                 continue;
@@ -269,18 +272,13 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
             switch (parser.getLocalName()) {
                 case "time":
-                    String raw = readTag(parser, "time");
-                    if (raw.equals("0")) {
-                        builder.setTime(new LocalTime(0, 0));
-                    } else {
-                        String hour = raw.substring(0, raw.length() - 2);
-                        String minute = raw.substring(raw.length() - 2);
-                        try {
-                            builder.setTime(new LocalTime(Integer.parseInt(hour, 10), Integer.parseInt(minute, 10)));
-                        } catch (NumberFormatException ex) {
-                            throw new XMLStreamException("Can't parse time: " + ex.getMessage(), ex);
-                        }
-                    }
+                    skipTag(parser);
+                    break;
+                case "UTCdate":
+                    utcDate = DateTimeFormat.forPattern("yyyy-MM-dd").withZoneUTC().parseDateTime(readTag(parser, "UTCdate"));
+                    break;
+                case "UTCtime":
+                    utcTime = readTime(readTag(parser, "UTCtime"));
                     break;
                 case "tempC":
                     builder.setTempC(readIntTag(parser, "tempC"));
@@ -391,6 +389,13 @@ public class WeatherParser extends BaseParser<WeatherReport> {
             }
         }
 
+        if (utcDate != null && utcTime != null) {
+            DateTime time = utcDate.withHourOfDay(utcTime.getHourOfDay()).withMinuteOfHour(utcTime.getMinuteOfHour());
+            builder.setTime(time);
+        } else {
+            builder.setTime(null);
+        }
+
         return builder.build();
     }
 
@@ -422,5 +427,19 @@ public class WeatherParser extends BaseParser<WeatherReport> {
         DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm").withZone(DateTimeZone.forOffsetHoursMinutes(hoursOffset, minutesOffset));
 
         return fmt.parseDateTime(rawDate);
+    }
+
+    private static LocalTime readTime(String raw) throws XMLStreamException {
+        if (raw.equals("0")) {
+            return new LocalTime(0, 0);
+        } else {
+            String hour = raw.substring(0, raw.length() - 2);
+            String minute = raw.substring(raw.length() - 2);
+            try {
+                return new LocalTime(Integer.parseInt(hour, 10), Integer.parseInt(minute, 10));
+            } catch (NumberFormatException ex) {
+                throw new XMLStreamException("Can't parse time: " + ex.getMessage(), ex);
+            }
+        }
     }
 }

@@ -56,7 +56,90 @@ public class WeatherParserTest {
     }
 
     @Test
-    public void testParser() throws Exception {
+    public void parse_utc() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        assertNotNull(report);
+        assertNotNull(report.getCurrent());
+        assertNotEquals(0, report.getForecasts().size());
+
+        DateTime when = new DateTime(2015, 7, 25, 11, 01, 0, DateTimeZone.forOffsetHours(1));
+
+        assertEquals(report.getLocalTime(), when);
+
+        Current current = report.getCurrent();
+
+        assertEquals(current.getObservationTime(), new LocalTime(10, 01));
+
+        assertEquals(current.getTempC(), 14);
+
+        assertEquals(current.getWeatherCode(), 116);
+        assertEquals(current.getWeatherIconUrl(), "http://cdn.worldweatheronline.net/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png");
+        assertEquals(current.getWeatherDesc(), "Partly Cloudy");
+
+        assertEquals(current.getWindspeedMPH(), 12);
+        assertEquals(current.getWinddirDegree(), 340);
+        assertEquals(current.getWinddirName(), "NNW");
+
+        assertEquals(current.getPrecipMM(), 0.0, 0.001);
+
+        assertEquals(current.getVisibilityKm(), 10);
+
+        assertEquals(current.getPressureMb(), 1012);
+
+        assertEquals(current.getCloudcover(), 50);
+
+        Forecast forecast = report.getForecasts().get(0);
+
+        assertEquals(forecast.getDate(), new LocalDate(2015, 7, 25));
+
+        assertEquals(forecast.getMaxTempC(), 18);
+        assertEquals(forecast.getMaxTempF(), 64);
+        assertEquals(forecast.getMinTempC(), 9);
+        assertEquals(forecast.getMinTempF(), 48);
+        assertEquals(forecast.getUvIndex(), 5);
+
+        Astronomy astronomy = forecast.getAstronomy();
+        assertNotNull(astronomy);
+
+        assertEquals(astronomy.getSunrise(), new LocalTime(5, 2));
+        assertEquals(astronomy.getSunset(), new LocalTime(21, 22));
+        assertEquals(astronomy.getMoonrise(), new LocalTime(15, 26));
+        assertEquals(astronomy.getMoonset(), new LocalTime(0, 22));
+
+        assertEquals(forecast.getHourly().size(), 8);
+
+        Hour hour = forecast.getHourly().get(0);
+
+        assertEquals(hour.getTime(), new DateTime(2015, 7, 25, 0, 0, 0, DateTimeZone.UTC));
+
+        assertEquals(hour.getTempC(), 11);
+        assertEquals(hour.getTempF(), 52);
+        assertEquals(hour.getWindspeedMiles(), 6);
+        assertEquals(hour.getWinddirDegree(), 347);
+        assertEquals(hour.getWeatherCode(), 113);
+        assertEquals(hour.getWeatherIconUrl(), "http://cdn.worldweatheronline.net/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png");
+        assertEquals(hour.getWeatherDesc(), "Clear");
+        assertEquals(hour.getPrecipMM(), 0.0, 0.001);
+        assertEquals(hour.getHumidity(), 84);
+        assertEquals(hour.getVisibility(), 10);
+        assertEquals(hour.getPressureMb(), 1011);
+        assertEquals(hour.getCloudcover(), 21);
+
+        assertEquals(hour.getHeatIndexC(), 11);
+        assertEquals(hour.getHeatIndexF(), 52);
+        assertEquals(hour.getDewPointC(), 9);
+        assertEquals(hour.getDewPointF(), 47);
+        assertEquals(hour.getWindChillC(), 10);
+        assertEquals(hour.getWindChillF(), 50);
+        assertEquals(hour.getWindGustMiles(), 11);
+        assertEquals(hour.getWindGustKmph(), 17);
+        assertEquals(hour.getFeelsLikeC(), 10);
+        assertEquals(hour.getFeelsLikeF(), 50);
+
+    }
+
+    public void parse_no_utc() throws Exception {
         WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample.xml"));
 
         assertNotNull(report);
@@ -110,6 +193,8 @@ public class WeatherParserTest {
         assertEquals(forecast.getHourly().size(), 8);
 
         Hour hour = forecast.getHourly().get(0);
+
+        assertEquals(hour.getTime(), new DateTime(2015, 7, 25, 0, 0, 0, DateTimeZone.UTC));
 
         assertEquals(hour.getTempC(), 11);
         assertEquals(hour.getTempF(), 51);
