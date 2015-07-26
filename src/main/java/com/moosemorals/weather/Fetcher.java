@@ -59,6 +59,11 @@ public class Fetcher {
     private static final Logger log = LoggerFactory.getLogger(Fetcher.class);
     private static final String ENDPOINT = "https://api.worldweatheronline.com/free/v2/weather.ashx";
 
+    /**
+     * Required link back to the API
+     */
+    public static final String BOILERPLATE = "Powered by <a href=\"http://www.worldweatheronline.com/\" title=\"Free Weather API\" target=\"_blank\">World Weather Online</a>";
+
     private final String apiKey;
     private final int num_of_days;
     private final DateTime date;

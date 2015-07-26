@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Weather Fetcher - Overview</title>
+    </head>
+    <body>
+        <h2>Introduction</h2>
+        <p>This project provides a Java wrapper around the Free API 
+            provided by <a href="www.worldweatheronline.com">worldweatheronline</a>.</p>
+        <p>I (the author) of this package has no affilation with worldweatheronline.com, although I am a happy user of their service.</p>
+        <h2>Usage</h2>
+        <ol><li>Register, and get an API key from <a href="https://developer.worldweatheronline.com/auth/register">the registration page</a>.</li>
+            <li><p>Run code something like:</p>
+                <pre>final String API_KEY = "...";
+final String LOCATION = "..."; // Name of a city, a postcode, a zipcode, an IPv4 address, or a lattitude,longitude pair
+FetchResult result = new Fetcher.Builder()
+	.setApiKey(API_KEY)
+	.build()
+	.fetch(LOCATION);
+
+if (result.isSuccess()) {
+	WeatherReport report = result.getReport();
+	System.out.println("The temprature in " + LOCATION + " is " + report.getTempC() + "\u00B0C";
+}</pre>
+            </li>
+        </ol>
+    </body>
+</html>
