@@ -48,11 +48,11 @@ import org.testng.annotations.Test;
  *
  * @author osric
  */
-public class WeatherParserTest {
+public class WeatherParserNGTest {
 
-    private final Logger log = LoggerFactory.getLogger(WeatherParserTest.class);
+    private final Logger log = LoggerFactory.getLogger(WeatherParserNGTest.class);
 
-    public WeatherParserTest() {
+    public WeatherParserNGTest() {
     }
 
     @Test
