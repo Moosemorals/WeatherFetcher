@@ -27,6 +27,7 @@ import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.Forecast;
 import com.moosemorals.weather.types.Hour;
+import com.moosemorals.weather.types.Location;
 import com.moosemorals.weather.types.WeatherReport;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -66,6 +67,11 @@ public class WeatherParserNGTest {
         DateTime when = new DateTime(2015, 7, 25, 11, 01, 0, DateTimeZone.forOffsetHours(1));
 
         assertEquals(report.getLocalTime(), when);
+
+        Location location = report.getLocation();
+        assertNotNull(location);
+        assertEquals(location.getType(), "UK Postcode");
+        assertEquals(location.getName(), "NE6");
 
         Current current = report.getCurrent();
 

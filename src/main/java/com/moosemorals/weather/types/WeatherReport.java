@@ -34,20 +34,17 @@ import org.joda.time.DateTime;
  */
 public class WeatherReport {
 
-    private Current current;
-    private DateTime when;
+    private final Location location;
+    private final Current current;
     private final List<Forecast> forecast;
-    private ErrorReport error;
+    private final DateTime when;
+    private final ErrorReport error;
 
-    public WeatherReport() {
-        forecast = new ArrayList<>();
-    }
-
-    public ErrorReport getError() {
-        return error;
-    }
-
-    public void setError(ErrorReport error) {
+    public WeatherReport(Location location, Current current, List<Forecast> forecast, DateTime when, ErrorReport error) {
+        this.location = location;
+        this.current = current;
+        this.forecast = forecast;
+        this.when = when;
         this.error = error;
     }
 
@@ -55,16 +52,16 @@ public class WeatherReport {
         return error == null;
     }
 
+    public ErrorReport getError() {
+        return error;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
     public Current getCurrent() {
         return current;
-    }
-
-    public void setCurrent(Current c) {
-        this.current = c;
-    }
-
-    public void addForecast(Forecast f) {
-        forecast.add(f);
     }
 
     public List<Forecast> getForecasts() {
@@ -75,8 +72,50 @@ public class WeatherReport {
         return when;
     }
 
-    public void setLocalTime(DateTime when) {
-        this.when = when;
+    public static class Builder {
+
+        private Location location;
+        private Current current;
+        private final List<Forecast> forecast;
+        private DateTime when;
+        private ErrorReport error;
+
+        public Builder() {
+            forecast = new ArrayList<>();
+        }
+
+        public Builder setLocation(Location location) {
+            this.location = location;
+            return this;
+        }
+
+        public Builder setCurrent(Current current) {
+            this.current = current;
+            return this;
+        }
+
+        public Builder addForecast(Forecast forecast) {
+            this.forecast.add(forecast);
+            return this;
+        }
+
+        public Builder setWhen(DateTime when) {
+            this.when = when;
+            return this;
+        }
+
+        public Builder setError(ErrorReport error) {
+            this.error = error;
+            return this;
+        }
+
+        public WeatherReport build() {
+            if (error == null) {
+                return new WeatherReport(location, current, forecast, when, null);
+            } else {
+                return new WeatherReport(null, null, null, null, error);
+            }
+        }
     }
 
 }

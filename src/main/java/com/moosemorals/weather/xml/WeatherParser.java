@@ -28,6 +28,7 @@ import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.ErrorReport;
 import com.moosemorals.weather.types.Forecast;
 import com.moosemorals.weather.types.Hour;
+import com.moosemorals.weather.types.Location;
 import com.moosemorals.weather.types.WeatherReport;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
@@ -53,7 +54,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
     public WeatherReport parse(XMLStreamReader parser) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "data");
 
-        WeatherReport report = new WeatherReport();
+        WeatherReport.Builder builder = new WeatherReport.Builder();
 
         while (parser.next() != XMLStreamReader.END_ELEMENT) {
             if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {
@@ -62,16 +63,19 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
             switch (parser.getLocalName()) {
                 case "error":
-                    report.setError(readError(parser));
+                    builder.setError(readError(parser));
+                    break;
+                case "request":
+                    builder.setLocation(readLocation(parser));
                     break;
                 case "current_condition":
-                    report.setCurrent(readCurrent(parser));
+                    builder.setCurrent(readCurrent(parser));
                     break;
                 case "weather":
-                    report.addForecast(readForecast(parser));
+                    builder.addForecast(readForecast(parser));
                     break;
                 case "time_zone":
-                    report.setLocalTime(readTimeZone(parser));
+                    builder.setWhen(readTimeZone(parser));
                     break;
                 default:
                     log.warn("Top: Skiping unexpected tag {}", parser.getLocalName());
@@ -79,7 +83,16 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     break;
             }
         }
-        return report;
+        return builder.build();
+    }
+
+    private ErrorReport readError(XMLStreamReader parser) throws XMLStreamException, IOException {
+        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "error");
+
+        while (parser.next() != XMLStreamReader.START_ELEMENT) {
+            // skip noise
+        }
+        return new ErrorReport("APIError", readTag(parser, "msg"));
     }
 
     private Current readCurrent(XMLStreamReader parser) throws XMLStreamException, IOException {
@@ -433,13 +446,27 @@ public class WeatherParser extends BaseParser<WeatherReport> {
         return fmt.parseDateTime(rawDate);
     }
 
-    private ErrorReport readError(XMLStreamReader parser) throws XMLStreamException, IOException {
-        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "error");
+    private Location readLocation(XMLStreamReader parser) throws XMLStreamException, IOException {
+        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "request");
 
-        while (parser.next() != XMLStreamReader.START_ELEMENT) {
-            // skip noise
+        Location.Builder builder = new Location.Builder();
+
+        while (parser.next() != XMLStreamReader.END_ELEMENT) {
+            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {
+                continue;
+            }
+
+            switch (parser.getLocalName()) {
+                case "type":
+                    builder.setType(readTag(parser, "type"));
+                    break;
+                case "query":
+                    builder.setName(readTag(parser, "query"));
+                    break;
+            }
         }
-        return new ErrorReport("APIError", readTag(parser, "msg"));
+
+        return builder.build();
     }
 
     private static LocalTime readTime(String raw) throws XMLStreamException {
