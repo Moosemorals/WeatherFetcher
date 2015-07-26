@@ -36,9 +36,9 @@ public class ErrorParserNGTest {
     @Test
     public void basic_parse() throws Exception {
 
-        ErrorResponse result = new ErrorParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+        ErrorResponse result = new ErrorParser().parse(getClass().getResourceAsStream("/error-no-key.xml"));
 
         assertEquals(result.getType(), "KeyError");
-        assertEquals(result.getMessage(), "No api_key specified");
+        assertEquals(result.getMessage(), "No api_key specified.");
     }
 }
