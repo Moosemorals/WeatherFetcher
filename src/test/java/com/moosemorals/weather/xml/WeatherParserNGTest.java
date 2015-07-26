@@ -139,87 +139,14 @@ public class WeatherParserNGTest {
 
     }
 
-    public void parse_no_utc() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample.xml"));
+    @Test
+    public void parse_sample_from_fetcher() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-from-fetcher.xml"));
 
-        assertNotNull(report);
-        assertNotNull(report.getCurrent());
-        assertNotEquals(0, report.getForecasts().size());
-
-        DateTime when = new DateTime(2015, 7, 24, 7, 26, 0, DateTimeZone.forOffsetHours(1));
-
-        assertEquals(report.getLocalTime(), when);
-
-        Current current = report.getCurrent();
-
-        assertEquals(current.getObservationTime(), new LocalTime(6, 26));
-
-        assertEquals(current.getTempC(), 8);
-
-        assertEquals(current.getWeatherCode(), 113);
-        assertEquals(current.getWeatherIconUrl(), "http://cdn.worldweatheronline.net/images/wsymbols01_png_64/wsymbol_0001_sunny.png");
-        assertEquals(current.getWeatherDesc(), "Sunny");
-
-        assertEquals(current.getWindspeedMPH(), 0);
-        assertEquals(current.getWinddirDegree(), 278);
-        assertEquals(current.getWinddirName(), "W");
-
-        assertEquals(current.getPrecipMM(), 0.0, 0.001);
-
-        assertEquals(current.getVisibilityKm(), 10);
-
-        assertEquals(current.getPressureMb(), 1013);
-
-        assertEquals(current.getCloudcover(), 0);
-
-        Forecast forecast = report.getForecasts().get(0);
-
-        assertEquals(forecast.getDate(), new LocalDate(2015, 7, 24));
-
-        assertEquals(forecast.getMaxTempC(), 21);
-        assertEquals(forecast.getMaxTempF(), 70);
-        assertEquals(forecast.getMinTempC(), 10);
-        assertEquals(forecast.getMinTempF(), 51);
-        assertEquals(forecast.getUvIndex(), 5);
-
-        Astronomy astronomy = forecast.getAstronomy();
-        assertNotNull(astronomy);
-
-        assertEquals(astronomy.getSunrise(), new LocalTime(5, 1));
-        assertEquals(astronomy.getSunset(), new LocalTime(21, 24));
-        assertEquals(astronomy.getMoonrise(), new LocalTime(14, 19));
-        assertEquals(astronomy.getMoonset(), null);
-
-        assertEquals(forecast.getHourly().size(), 8);
-
-        Hour hour = forecast.getHourly().get(0);
-
-        assertEquals(hour.getTime(), new DateTime(2015, 7, 25, 0, 0, 0, DateTimeZone.UTC));
-
-        assertEquals(hour.getTempC(), 11);
-        assertEquals(hour.getTempF(), 51);
-        assertEquals(hour.getWindspeedMiles(), 7);
-        assertEquals(hour.getWinddirDegree(), 254);
-        assertEquals(hour.getWeatherCode(), 113);
-        assertEquals(hour.getWeatherIconUrl(), "http://cdn.worldweatheronline.net/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png");
-        assertEquals(hour.getWeatherDesc(), "Clear");
-        assertEquals(hour.getPrecipMM(), 0.0, 0.001);
-        assertEquals(hour.getHumidity(), 85);
-        assertEquals(hour.getVisibility(), 10);
-        assertEquals(hour.getPressureMb(), 1014);
-        assertEquals(hour.getCloudcover(), 17);
-
-        assertEquals(hour.getHeatIndexC(), 11);
-        assertEquals(hour.getHeatIndexF(), 51);
-        assertEquals(hour.getDewPointC(), 8);
-        assertEquals(hour.getDewPointF(), 46);
-        assertEquals(hour.getWindChillC(), 9);
-        assertEquals(hour.getWindChillF(), 48);
-        assertEquals(hour.getWindGustMiles(), 13);
-        assertEquals(hour.getWindGustKmph(), 21);
-        assertEquals(hour.getFeelsLikeC(), 9);
-        assertEquals(hour.getFeelsLikeF(), 48);
-
+        assertEquals(report.getForecasts().size(), 3);
+        for (Forecast f : report.getForecasts()) {
+            assertEquals(f.getHourly().size(), 8);
+        }
     }
 
     @Test

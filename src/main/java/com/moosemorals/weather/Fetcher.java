@@ -24,15 +24,20 @@
 package com.moosemorals.weather;
 
 import com.moosemorals.weather.types.ErrorResponse;
-import com.moosemorals.weather.types.WeatherReport;
+import com.moosemorals.weather.types.FetchResult;
 import com.moosemorals.weather.xml.ErrorParser;
 import com.moosemorals.weather.xml.WeatherParser;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -51,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Fetcher {
 
-    private final Logger log = LoggerFactory.getLogger(Fetcher.class);
+    private static final Logger log = LoggerFactory.getLogger(Fetcher.class);
     private static final String ENDPOINT = "https://api.worldweatheronline.com/free/v2/weather.ashx";
 
     private final String apiKey;
@@ -84,7 +89,7 @@ public class Fetcher {
      * @return WeatherReport containg current data
      * @throws IOException if there are network problems, or the api request is
      */
-    public WeatherReport fetch(String location) throws IOException {
+    public FetchResult fetch(String location) throws IOException {
         return fetch(location, HttpClients.createDefault());
     }
 
@@ -106,11 +111,11 @@ public class Fetcher {
      * @return WeatherReport containg current data
      * @throws IOException if there are network problems, or the api request is
      */
-    public WeatherReport fetch(String location, CloseableHttpClient httpClient) throws IOException {
+    public FetchResult fetch(String location, CloseableHttpClient httpClient) throws IOException {
 
         Map<String, String> param = new HashMap<>();
 
-        param.put("q", "location");
+        param.put("q", location);
         param.put("key", "[HIDDEN]");
         param.put("extra", "utcDateTime");
         param.put("num_of_days", Integer.toString(num_of_days));
@@ -140,9 +145,12 @@ public class Fetcher {
             log.debug("Response {}", status);
             HttpEntity body = response.getEntity();
 
+            int requestsPerSecond = getIntFromHeader(response, "x-apiaxleproxy-qps-left");
+            int requestsPerDay = getIntFromHeader(response, "x-apiaxleproxy-qpd-left");
+
             try {
                 if (status.getStatusCode() == 200) {
-                    return new WeatherParser().parse(body.getContent());
+                    return new FetchResult(new WeatherParser().parse(dumpInputStream(body.getContent())), requestsPerSecond, requestsPerDay);
                 } else {
                     ErrorResponse error = new ErrorParser().parse(body.getContent());
                     throw new IOException("Could not fetch result from [" + loggableTarget + "]: " + error.getType() + ": " + error.getMessage());
@@ -150,9 +158,37 @@ public class Fetcher {
             } finally {
                 EntityUtils.consume(body);
             }
+
         } catch (XMLStreamException ex) {
             throw new IOException("Could not parse result from [" + loggableTarget + "]: " + ex.getMessage(), ex);
         }
+    }
+
+    private static int getIntFromHeader(CloseableHttpResponse response, String headerName) {
+        Header firstHeader = response.getFirstHeader(headerName);
+        if (firstHeader != null) {
+            return Integer.parseInt(firstHeader.getValue(), 10);
+        } else {
+            return -1;
+        }
+    }
+
+    private static InputStream dumpInputStream(InputStream in) throws IOException {
+        if (!log.isDebugEnabled()) {
+            return in;
+        }
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+
+        StringBuilder data = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            data.append(line).append(System.lineSeparator());
+        }
+
+        log.debug("Recieved File\n------\n{}\n------", data.toString());
+
+        return new ByteArrayInputStream(data.toString().getBytes("UTF-8"));
     }
 
     /**

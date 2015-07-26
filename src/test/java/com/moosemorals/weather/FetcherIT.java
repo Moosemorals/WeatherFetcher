@@ -23,15 +23,21 @@
  */
 package com.moosemorals.weather;
 
+import com.moosemorals.weather.types.FetchResult;
+import com.moosemorals.weather.types.Forecast;
 import com.moosemorals.weather.types.WeatherReport;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -41,11 +47,15 @@ import org.testng.annotations.Test;
  */
 public class FetcherIT {
 
+    private final Logger log = LoggerFactory.getLogger(FetcherIT.class);
+
     public FetcherIT() {
     }
 
     private CloseableHttpClient httpClient;
     private String apiKey;
+    private int requestsPerSecond;
+    private int requestsPerDay;
 
     @BeforeClass
     public void setUpClass() throws Exception {
@@ -53,25 +63,104 @@ public class FetcherIT {
         apiKey = loadAPIKey(getClass().getResourceAsStream("/apiKey"));
     }
 
-    @Test
-    public void apiKey() throws Exception {
-        assertNotNull(apiKey);
-    }
-
-    @Test(dependsOnMethods = {"apiKey"})
-    public void basicFetch() throws Exception {
-        WeatherReport report = new Fetcher.Builder().setApiKey(apiKey).build().fetch("NE6");
-
-        assertNotNull(report);
-        assertNotNull(report.getCurrent());
-        assertTrue(report.getForecasts().size() > 0);
-
-        System.out.println(report.getLocalTime());
+    @AfterMethod
+    public void afterMethod() throws Exception {
+        log.info("Currently have {} requests left this second, {} requests left this day", requestsPerSecond, requestsPerDay);
+        if (requestsPerSecond <= 1) {
+            log.info("Run out of requests, sleeping for a second");
+            Thread.sleep(1000);
+        }
+        if (requestsPerDay <= 1) {
+            log.error("Run out of requests for today, giving up");
+            assertTrue(false, "No requests availible");
+        }
     }
 
     @AfterClass
     public void tearDownClass() throws Exception {
         httpClient.close();
+    }
+
+    @Test
+    public void basicFetch() throws Exception {
+        // Fetching for Newcastle Upon Tyne, UK
+        FetchResult result = new Fetcher.Builder()
+                .setApiKey(apiKey)
+                .build().fetch("NE6");
+
+        requestsPerDay = result.getRequestsPerDay();
+        requestsPerSecond = result.getRequestsPerSecond();
+
+        WeatherReport report = result.getReport();
+        assertNotNull(report, "Report should not be null");
+        assertNotNull(report.getCurrent(), "Current conditions should not be null");
+        assertEquals(report.getForecasts().size(), 3, "Should have 3 days of reports");
+        for (Forecast f : report.getForecasts()) {
+            assertEquals(f.getHourly().size(), 8, "Shoulr have 8 reports/day");
+        }
+
+        // Newcastle is in the Europe/London timezone.
+        // Turns out the server clock isn't good enough to test this.
+        // Ah, well.
+        // assertEquals(report.getLocalTime(), new DateTime(DateTimeZone.forID("Europe/London")).withMillisOfSecond(0).withSecondOfMinute(0));
+    }
+
+    @Test
+    public void fetchNothing() throws Exception {
+        // Fetching for Newcastle Upon Tyne, UK
+        FetchResult result = new Fetcher.Builder()
+                .setApiKey(apiKey)
+                .setForecast(false)
+                .setCurrent(false)
+                .build().fetch("NE6");
+
+        requestsPerDay = result.getRequestsPerDay();
+        requestsPerSecond = result.getRequestsPerSecond();
+
+        WeatherReport report = result.getReport();
+        assertNotNull(report, "Report should not be null");
+        assertEquals(report.getCurrent(), null, "Current should be null");
+        assertTrue(report.getForecasts().isEmpty(), "Should have no forecast");
+    }
+
+    @Test
+    public void fetchOneDay() throws Exception {
+        // Fetching for Newcastle Upon Tyne, UK
+        FetchResult result = new Fetcher.Builder()
+                .setApiKey(apiKey)
+                .setNumOfDays(1)
+                .build().fetch("NE6");
+
+        requestsPerDay = result.getRequestsPerDay();
+        requestsPerSecond = result.getRequestsPerSecond();
+
+        WeatherReport report = result.getReport();
+        assertNotNull(report, "Report should not be null");
+        assertNotNull(report.getCurrent(), "Current conditions should not be null");
+        assertEquals(report.getForecasts().size(), 1, "Should have 1 day of reports");
+        for (Forecast f : report.getForecasts()) {
+            assertEquals(f.getHourly().size(), 8, "Should have 8 reports/day");
+        }
+    }
+
+    @Test
+    public void fetch6Hours() throws Exception {
+        // Fetching for Newcastle Upon Tyne, UK
+        FetchResult result = new Fetcher.Builder()
+                .setApiKey(apiKey)
+                .setFrequency(6)
+                .build().fetch("NE6");
+
+        requestsPerDay = result.getRequestsPerDay();
+        requestsPerSecond = result.getRequestsPerSecond();
+
+        WeatherReport report = result.getReport();
+        assertNotNull(report, "Report should not be null");
+        assertNotNull(report.getCurrent(), "Current conditions should not be null");
+        assertEquals(report.getForecasts().size(), 3, "Should have 1 day of reports");
+        for (Forecast f : report.getForecasts()) {
+            assertEquals(f.getHourly().size(), 4, "Should have 4 reports/day");
+        }
     }
 
     private static String loadAPIKey(InputStream in) throws Exception {
