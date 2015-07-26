@@ -22,6 +22,11 @@
  * THE SOFTWARE.
  */
 /**
- *
+ * Main entry point to the project. Use
+ * {@link com.moosemorals.weather.Fetcher.Builder} to build a
+ * {@link com.moosemorals.weather.Fetcher}. Call
+ * {@link com.moosemorals.weather.Fetcher#fetch(String) fetch} to get a
+ * {@link com.moosemorals.weather.types.FetchResult}, which should hold a
+ * {@link com.moosemorals.weather.types.WeatherReport}
  */
 package com.moosemorals.weather;

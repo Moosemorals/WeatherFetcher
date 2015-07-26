@@ -81,12 +81,19 @@ public class FetcherIT {
         httpClient.close();
     }
 
+    @Test(expectedExceptions = NullPointerException.class)
+    public void fetchNoParams() throws Exception {
+        FetchResult result = new Fetcher.Builder().build().fetch();
+    }
+
     @Test
     public void basicFetch() throws Exception {
         // Fetching for Newcastle Upon Tyne, UK
         FetchResult result = new Fetcher.Builder()
                 .setApiKey(apiKey)
-                .build().fetch("NE6");
+                .setLocation("NE6")
+                .build()
+                .fetch();
 
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
@@ -112,7 +119,9 @@ public class FetcherIT {
                 .setApiKey(apiKey)
                 .setForecast(false)
                 .setCurrent(false)
-                .build().fetch("NE6");
+                .setLocation("NE6")
+                .build()
+                .fetch();
 
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
@@ -129,7 +138,9 @@ public class FetcherIT {
         FetchResult result = new Fetcher.Builder()
                 .setApiKey(apiKey)
                 .setNumOfDays(1)
-                .build().fetch("NE6");
+                .setLocation("NE6")
+                .build()
+                .fetch();
 
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
@@ -149,7 +160,9 @@ public class FetcherIT {
         FetchResult result = new Fetcher.Builder()
                 .setApiKey(apiKey)
                 .setFrequency(6)
-                .build().fetch("NE6");
+                .setLocation("NE6")
+                .build()
+                .fetch();
 
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();

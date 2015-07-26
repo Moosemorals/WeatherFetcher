@@ -27,42 +27,38 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 /**
- * Test Fetcher class.
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
-public class FetcherNGTest {
+public class UtilNGTest {
 
-    public FetcherNGTest() {
-    }
-
-    @Test
-    public void testFetch() throws Exception {
+    public UtilNGTest() {
     }
 
     @Test
     public void assembleURL_noParam() throws Exception {
-        String result = Fetcher.assembleURL("a");
+        String result = Util.assembleURL("a");
 
         assertEquals(result, "a");
     }
 
     @Test
     public void assembleURL_oneParam() throws Exception {
-        String result = Fetcher.assembleURL("a", "b", "c");
+        String result = Util.assembleURL("a", "b", "c");
 
         assertEquals(result, "a?b=c");
     }
 
     @Test
     public void assembleURL_twoParam() throws Exception {
-        String result = Fetcher.assembleURL("a", "b", "c", "d", "e");
+        String result = Util.assembleURL("a", "b", "c", "d", "e");
 
         assertEquals(result, "a?b=c&d=e");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void assembleURL_oddParam() throws Exception {
-        String result = Fetcher.assembleURL("a", "b");
+        String result = Util.assembleURL("a", "b");
     }
+
 }

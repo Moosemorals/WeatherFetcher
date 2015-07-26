@@ -32,8 +32,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
@@ -51,6 +49,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Fetch weather data from the backend, using a provided HttpClient or building
+ * one if needed. </p>
+ *
+ * Build and set options on a Fetcher using {@link Fetcher.Builder}, and then
+ * call @{#fetch(String) fetch} to get the result.
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
@@ -60,19 +63,24 @@ public class Fetcher {
     private static final String ENDPOINT = "https://api.worldweatheronline.com/free/v2/weather.ashx";
 
     /**
-     * Required link back to the API
+     * Required link back to the API. Code that uses the api must display a link
+     * to the provider. This is how they recommend you format it.
      */
     public static final String BOILERPLATE = "Powered by <a href=\"http://www.worldweatheronline.com/\" title=\"Free Weather API\" target=\"_blank\">World Weather Online</a>";
 
     private final String apiKey;
+    private final String location;
+    private final CloseableHttpClient httpClient;
     private final int num_of_days;
     private final DateTime date;
     private final boolean forecast;
     private final boolean current;
     private final int timePeriod;
 
-    private Fetcher(String apiKey, int num_of_days, DateTime date, boolean forecast, boolean current, int timePeriod) {
+    private Fetcher(String apiKey, String location, CloseableHttpClient httpClient, int num_of_days, DateTime date, boolean forecast, boolean current, int timePeriod) {
         this.apiKey = apiKey;
+        this.location = location;
+        this.httpClient = httpClient;
         this.num_of_days = num_of_days;
         this.date = date;
         this.forecast = forecast;
@@ -83,45 +91,26 @@ public class Fetcher {
     /**
      * Fetch weather report using parameters set in the builder. </p>
      *
-     * Location parameter here can be the name of a city, a UK or Canadian post
-     * code, a US zip code, an ipv4 address (in dotted quad notation) or
-     * Latitude,Longitude (decimal degrees, separated by comma).</p>
-     *
      * Throws IOException for problems. Potential problems include network
      * issues (can't connect to the API) or API issues (Missing/invalid API key)
      *
-     * @param location String location of weather report
      * @return WeatherReport containg current data
      * @throws IOException if there are network problems, or the api request is
      */
-    public FetchResult fetch(String location) throws IOException {
-        return fetch(location, HttpClients.createDefault());
-    }
+    public FetchResult fetch() throws IOException {
+        // Check for required parameters
+        if (apiKey == null) {
+            throw new NullPointerException("API key not set");
+        }
 
-    /**
-     * Fetch weather report using parameters set in the builder. </p>
-     *
-     * Location parameter here can be the name of a city, a UK or Canadian post
-     * code, a US zip code, an ipv4 address (in dotted quad notation) or
-     * Latitude,Longitude (decimal degrees, separated by comma).</p>
-     *
-     * HttpClient is a httpClient that has all ready been configured and is
-     * ready to use.</p>
-     *
-     * Throws IOException for problems. Potential problems include network
-     * issues (can't connect to the API) or API issues (Missing/invalid API key)
-     *
-     * @param location String location of weather report
-     * @param httpClient HttpClient to use to fetch report
-     * @return WeatherReport containg current data
-     * @throws IOException if there are network problems, or the api request is
-     */
-    public FetchResult fetch(String location, CloseableHttpClient httpClient) throws IOException {
+        if (location == null) {
+            throw new NullPointerException("Location not set");
+        }
 
         Map<String, String> param = new HashMap<>();
 
         param.put("q", location);
-        param.put("key", "[HIDDEN]");
+        param.put("key", "HIDDEN");
         param.put("extra", "utcDateTime");
         param.put("num_of_days", Integer.toString(num_of_days));
         param.put("tp", Integer.toString(timePeriod));
@@ -137,10 +126,10 @@ public class Fetcher {
             param.put("cc", "no");
         }
 
-        String loggableTarget = assembleURL(ENDPOINT, flattenMap(param));
+        String loggableTarget = Util.assembleURL(Fetcher.ENDPOINT, Util.flattenMap(param));
 
         param.put("key", apiKey);
-        String target = assembleURL(ENDPOINT, flattenMap(param));
+        String target = Util.assembleURL(Fetcher.ENDPOINT, Util.flattenMap(param));
 
         HttpGet request = new HttpGet(target);
 
@@ -197,59 +186,13 @@ public class Fetcher {
     }
 
     /**
-     * Turn a Map&lt;String, String&gt; to an array of Strings.
-     *
-     * @param map Map&lt;String, String&gt; to convert
-     * @return String[] containg ordered key/value pairs
-     */
-    static String[] flattenMap(Map<String, String> map) {
-        String[] result = new String[map.size() * 2];
-
-        int i = 0;
-        for (String key : map.keySet()) {
-            result[i] = key;
-            result[i + 1] = map.get(key);
-            i += 2;
-        }
-        return result;
-    }
-
-    /**
-     * Add a query string to a URL.
-     *
-     * @param base String Base url. Should be well formed, but that isn't
-     * checked.
-     * @param parameters String... list of key/value pairs.
-     * @return String URL ready to pass to httpClient to fetch
-     * @throws IllegalArgumentException if the parameters don't come in pairs
-     * @throws UnsupportedEncodingException if Java doesn't know UTF-8
-     */
-    static String assembleURL(String base, String... parameters) throws UnsupportedEncodingException {
-        if (parameters == null || parameters.length == 0) {
-            return base;
-        } else if (parameters.length % 2 != 0) {
-            throw new IllegalArgumentException("Parameters must come in (name, value) pairs");
-        }
-
-        StringBuilder result = new StringBuilder();
-        result.append(base).append("?");
-        for (int i = 0; i < parameters.length; i += 2) {
-            if (i >= 2) {
-                result.append("&");
-            }
-            result.append(URLEncoder.encode(parameters[i], "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(parameters[i + 1], "UTF-8"));
-        }
-        return result.toString();
-    }
-
-    /**
-     * Build a Fetcher
+     * Build a Fetcher and set its options.
      */
     public static class Builder {
 
         private String apiKey;
+        private String location;
+        private CloseableHttpClient httpClient = HttpClients.createDefault();
         private int num_of_days = 3;
         private DateTime date = null;
         private boolean forecast = true;
@@ -261,7 +204,8 @@ public class Fetcher {
         }
 
         /**
-         * Required api key from worldweatheronline.com for their V2 API.
+         * Api key from worldweatheronline.com for their V2 API. Required, no
+         * default. </p>
          *
          * You can register for a key at
          * <a href="https://developer.worldweatheronline.com/auth/register">https://developer.worldweatheronline.com/auth/register</a>
@@ -279,8 +223,41 @@ public class Fetcher {
         }
 
         /**
-         * Number of days to fetch. Optional, default 3. Apparently can be as
-         * high as 15, but I don't think the free api supports that many.
+         * Location to fetch for. Required, no default.</p>
+         *
+         * May be a UK or Canadian postcode, US zip code, name of a city, IPv4
+         * address (in dotted quad notation) or Latitude, Longitude pair
+         * (decimal degrees, comma separated)
+         *
+         * @param location String name of the location. The API will work out
+         * the type from context.
+         * @return this Builder for chaining
+         */
+        public Builder setLocation(String location) {
+            this.location = location;
+            return this;
+        }
+
+        /**
+         * HttpClient to use to fetch. Optional, default
+         * HttpClients.getDefault(). </p>
+         *
+         * Provide your own client to manage e.g. cookies, certificates or
+         * caching.
+         *
+         * @param httpClient CloseableHttpClient to use to connect to the API
+         * @return this Builder for chaining.
+         */
+        public Builder setHttpClient(CloseableHttpClient httpClient) {
+            this.httpClient = httpClient;
+            return this;
+        }
+
+        /**
+         * Number of days to fetch. Optional, default 3. </p>
+         *
+         * Apparently can be as high as 15, but I don't think the free api
+         * supports that many.
          *
          * @param num_of_days int number of days to fetch
          * @return this Builder for chaining
@@ -294,7 +271,7 @@ public class Fetcher {
         }
 
         /**
-         * Date to fetch weather for. Optional, default today.
+         * Date to fetch weather for. Optional, default today. </p>
          *
          * @param date DateTime date to fetch weather for.
          * @return this Builder for chaining
@@ -305,8 +282,9 @@ public class Fetcher {
         }
 
         /**
-         * Fetch weather forecast. Optional, default true. False means don't
-         * fetch any forecast information.
+         * Fetch weather forecast. Optional, default true. </p>
+         *
+         * False means don't fetch any forecast information.
          *
          * @param forecast boolean true to fetch forecast, false otherwise.
          * @return this Builder for chaining
@@ -317,8 +295,9 @@ public class Fetcher {
         }
 
         /**
-         * Fetch current conditions. Optional, default true. False means don't
-         * fetch current weather conditions for your location.
+         * Fetch current conditions. Optional, default true. </p>
+         *
+         * False means don't fetch current weather conditions for your location.
          *
          * @param current boolean true to fetch current conditions, false
          * otherwise.
@@ -330,8 +309,10 @@ public class Fetcher {
         }
 
         /**
-         * Frequency of forecasts, in hours. Optional, default 3. Can be 3, 6,
-         * 12 or 24. Other values are ignored by the API (and revert to 3)
+         * Frequency of forecasts, in hours. Optional, default 3. </p>
+         *
+         * Can be 3, 6, 12 or 24. Other values are ignored by the API (and
+         * revert to 3)
          *
          * @param timePeriod int hours between forecasts
          * @return this Builder for chaining
@@ -342,7 +323,7 @@ public class Fetcher {
         }
 
         public Fetcher build() {
-            return new Fetcher(apiKey, num_of_days, date, forecast, current, timePeriod);
+            return new Fetcher(apiKey, location, httpClient, num_of_days, date, forecast, current, timePeriod);
         }
     }
 
