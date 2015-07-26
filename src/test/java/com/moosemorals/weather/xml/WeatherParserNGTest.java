@@ -91,15 +91,15 @@ public class WeatherParserNGTest {
         assertEquals(current.getWeatherIconUrl(), "http://cdn.worldweatheronline.net/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png");
         assertEquals(current.getWeatherDesc(), "Partly Cloudy");
 
-        assertEquals(current.getWindspeedMPH(), 12);
+        assertEquals(current.getWindspeedMiles(), 12);
         assertEquals(current.getWinddirDegree(), 340);
-        assertEquals(current.getWinddirName(), "NNW");
+        assertEquals(current.getWinddir16Point(), "NNW");
 
         assertEquals(current.getPrecipMM(), 0.0, 0.001);
 
-        assertEquals(current.getVisibilityKm(), 10);
+        assertEquals(current.getVisibility(), 10);
 
-        assertEquals(current.getPressureMb(), 1012);
+        assertEquals(current.getPressure(), 1012);
 
         assertEquals(current.getCloudcover(), 50);
 

@@ -26,6 +26,7 @@ package com.moosemorals.weather.types;
 import org.joda.time.LocalTime;
 
 /**
+ * Current weather at the requested location.
  *
  * @author osric
  */
@@ -34,131 +35,219 @@ public class Current {
     private final LocalTime observationTime;
     private final int tempC;
     private final int tempF;
-    private final int windspeedMPH;
-    private final int windspeedKPH;
-    private final int winddirDegree;
-    private final String winddirName;
     private final int weatherCode;
     private final String weatherIconUrl;
     private final String weatherDesc;
+    private final int windspeedMiles;
+    private final int windspeedKmph;
+    private final int winddirDegree;
+    private final String winddir16Point;
     private final float precipMM;
     private final int humidity;
-    private final int visibilityKm;
-    private final int visibilityMiles;
-    private final int pressureMb;
-    private final int pressureInches;
+    private final int visibility;
+    private final int pressure;
     private final int cloudcover;
     private final int feelsLikeC;
     private final int feelsLikeF;
 
-    private Current(LocalTime observationTime, int tempC, int tempF, int windspeedMPH, int windspeedKPH, int winddirDegree, String winddirName, int weatherCode, String weatherIconUrl, String weatherDesc, float precipMM, int humidity, int visibilityKm, int visibilityMiles, int pressureMb, int pressureInches, int cloudcover, int feelsLikeC, int feelsLikeF) {
+    private Current(LocalTime observationTime, int tempC, int tempF, int weatherCode, String weatherIconUrl, String weatherDesc, int windspeedMiles, int windspeedKmph, int winddirDegree, String winddir16Point, float precipMM, int humidity, int visibility, int pressure, int cloudcover, int feelsLikeC, int feelsLikeF) {
         this.observationTime = observationTime;
         this.tempC = tempC;
         this.tempF = tempF;
-        this.windspeedMPH = windspeedMPH;
-        this.windspeedKPH = windspeedKPH;
-        this.winddirDegree = winddirDegree;
-        this.winddirName = winddirName;
         this.weatherCode = weatherCode;
         this.weatherIconUrl = weatherIconUrl;
         this.weatherDesc = weatherDesc;
+        this.windspeedMiles = windspeedMiles;
+        this.windspeedKmph = windspeedKmph;
+        this.winddirDegree = winddirDegree;
+        this.winddir16Point = winddir16Point;
         this.precipMM = precipMM;
         this.humidity = humidity;
-        this.visibilityKm = visibilityKm;
-        this.visibilityMiles = visibilityMiles;
-        this.pressureMb = pressureMb;
-        this.pressureInches = pressureInches;
+        this.visibility = visibility;
+        this.pressure = pressure;
         this.cloudcover = cloudcover;
         this.feelsLikeC = feelsLikeC;
         this.feelsLikeF = feelsLikeF;
     }
 
+    /**
+     * Time of the observation, UTC.
+     *
+     * @return int Time of the observation, UTC.
+     */
     public LocalTime getObservationTime() {
         return observationTime;
     }
 
+    /**
+     * Air temperature, &deg;C.
+     *
+     * @return int Air temperature, &deg;C
+     */
     public int getTempC() {
         return tempC;
     }
 
+    /**
+     * Air temperature, &deg;F.
+     *
+     * @return int Air temperature, &deg;F
+     */
     public int getTempF() {
         return tempF;
     }
 
-    public int getWindspeedMPH() {
-        return windspeedMPH;
-    }
-
-    public int getWindspeedKPH() {
-        return windspeedKPH;
-    }
-
-    public int getWinddirDegree() {
-        return winddirDegree;
-    }
-
-    public String getWinddirName() {
-        return winddirName;
-    }
-
+    /**
+     * (Arbitrary) code to describe the current weather. A list of code <->
+     * human readable strings is available from
+     * <a href="http://www.worldweatheronline.com/feed/wwoConditionCodes.xml">http://www.worldweatheronline.com/feed/wwoConditionCodes.xml</a>
+     *
+     * @return int current weather code
+     */
     public int getWeatherCode() {
         return weatherCode;
     }
 
+    /**
+     * URL to an icon for the current weather.
+     *
+     * @return String url for an icon
+     */
     public String getWeatherIconUrl() {
         return weatherIconUrl;
     }
 
+    /**
+     * Human readable string to describe the current leather.
+     *
+     * @return String describing current weather
+     */
     public String getWeatherDesc() {
         return weatherDesc;
     }
 
+    /**
+     * Wind speed in miles per hour.
+     *
+     * @return int current wind speed in miles per hour
+     */
+    public int getWindspeedMiles() {
+        return windspeedMiles;
+    }
+
+    /**
+     * Wind speed in kilometres per hour.
+     *
+     * @return int current wind speed in kilometres per hour
+     */
+    public int getWindspeedKmph() {
+        return windspeedKmph;
+    }
+
+    /**
+     * Wind direction in degrees from North.
+     *
+     * @return int current wind direction in degrees
+     */
+    public int getWinddirDegree() {
+        return winddirDegree;
+    }
+
+    /**
+     * Wind direction as compass point.
+     *
+     * @return String current wind direction as compass point
+     */
+    public String getWinddir16Point() {
+        return winddir16Point;
+    }
+
+    /**
+     * Precipitation in mm.
+     *
+     * @return int current perecipitation in mm
+     */
     public float getPrecipMM() {
         return precipMM;
     }
 
+    /**
+     * Relative humidity as an integer percent (between 0 and 100).
+     *
+     * @return int current relative humidity
+     */
     public int getHumidity() {
         return humidity;
     }
 
-    public int getVisibilityKm() {
-        return visibilityKm;
+    /**
+     * Visibility in kilometres (between 0 and 10).
+     *
+     * @return int current visibility in kilometres
+     */
+    public int getVisibility() {
+        return visibility;
     }
 
-    public int getVisibilityMiles() {
-        return visibilityMiles;
+    /**
+     * Pressure in millibar.
+     *
+     * @return int current pressure in millibar
+     */
+    public int getPressure() {
+        return pressure;
     }
 
-    public int getPressureMb() {
-        return pressureMb;
-    }
-
-    public int getPressureInches() {
-        return pressureInches;
-    }
-
+    /**
+     * Cloud cover as an integer percent (between 0 and 100)
+     *
+     * @return int current cloud cover
+     */
     public int getCloudcover() {
         return cloudcover;
     }
 
+    /**
+     * "Feels Like" or apparent temperature &deg;C. Calculated (using unknown
+     * algorithm) based on actual temperature, relative humidity, and wind
+     * speed.
+     *
+     * @return int "Feels Like" temperature, &deg;C
+     */
+    public int getFeelsLikeC() {
+        return feelsLikeC;
+    }
+
+    /**
+     * "Feels Like" or apparent temperature &deg;F. Calculated (using unknown
+     * algorithm) based on actual temperature, relative humidity, and wind
+     * speed.
+     *
+     * @return int "Feels Like" temperature, &deg;F
+     */
+    public int getFeelsLikeF() {
+        return feelsLikeF;
+    }
+
+    /**
+     * Build a new Weather Report. Not really useful to end users.
+     */
     public static class Builder {
 
         private LocalTime observationTime;
         private int tempC;
         private int tempF;
-        private int windspeedMPH;
-        private int windspeedKPH;
-        private int winddirDegree;
-        private String winddirName;
         private int weatherCode;
         private String weatherIconUrl;
         private String weatherDesc;
+        private int windspeedMiles;
+        private int windspeedKmph;
+        private int winddirDegree;
+        private String winddir16Point;
         private float precipMM;
         private int humidity;
-        private int visibilityKm;
-        private int visibilityMiles;
-        private int pressureMb;
-        private int pressureInches;
+        private int visibility;
+        private int pressure;
         private int cloudcover;
         private int feelsLikeC;
         private int feelsLikeF;
@@ -182,26 +271,6 @@ public class Current {
             return this;
         }
 
-        public Builder setWindspeedMPH(int windspeedMPH) {
-            this.windspeedMPH = windspeedMPH;
-            return this;
-        }
-
-        public Builder setWindspeedKPH(int windspeedKPH) {
-            this.windspeedKPH = windspeedKPH;
-            return this;
-        }
-
-        public Builder setWinddirDegree(int winddirDegree) {
-            this.winddirDegree = winddirDegree;
-            return this;
-        }
-
-        public Builder setWinddirName(String winddirName) {
-            this.winddirName = winddirName;
-            return this;
-        }
-
         public Builder setWeatherCode(int weatherCode) {
             this.weatherCode = weatherCode;
             return this;
@@ -217,6 +286,26 @@ public class Current {
             return this;
         }
 
+        public Builder setWindspeedMiles(int windspeedMiles) {
+            this.windspeedMiles = windspeedMiles;
+            return this;
+        }
+
+        public Builder setWindspeedKmph(int windspeedKmph) {
+            this.windspeedKmph = windspeedKmph;
+            return this;
+        }
+
+        public Builder setWinddirDegree(int winddirDegree) {
+            this.winddirDegree = winddirDegree;
+            return this;
+        }
+
+        public Builder setWinddir16Point(String winddir16Point) {
+            this.winddir16Point = winddir16Point;
+            return this;
+        }
+
         public Builder setPrecipMM(float precipMM) {
             this.precipMM = precipMM;
             return this;
@@ -227,23 +316,13 @@ public class Current {
             return this;
         }
 
-        public Builder setVisibilityKm(int visibilityKm) {
-            this.visibilityKm = visibilityKm;
+        public Builder setVisibility(int visibility) {
+            this.visibility = visibility;
             return this;
         }
 
-        public Builder setVisibilityMiles(int visibilityMiles) {
-            this.visibilityMiles = visibilityMiles;
-            return this;
-        }
-
-        public Builder setPressureMb(int pressureMb) {
-            this.pressureMb = pressureMb;
-            return this;
-        }
-
-        public Builder setPressureInches(int pressureInches) {
-            this.pressureInches = pressureInches;
+        public Builder setPressure(int pressure) {
+            this.pressure = pressure;
             return this;
         }
 
@@ -263,7 +342,7 @@ public class Current {
         }
 
         public Current build() {
-            return new Current(observationTime, tempC, tempF, windspeedMPH, windspeedKPH, winddirDegree, winddirName, weatherCode, weatherIconUrl, weatherDesc, precipMM, humidity, visibilityKm, visibilityMiles, pressureMb, pressureInches, cloudcover, feelsLikeC, feelsLikeF);
+            return new Current(observationTime, tempC, tempF, weatherCode, weatherIconUrl, weatherDesc, windspeedMiles, windspeedKmph, winddirDegree, winddir16Point, precipMM, humidity, visibility, pressure, cloudcover, feelsLikeC, feelsLikeF);
         }
     }
 

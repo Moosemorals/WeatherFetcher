@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Parse error result from the API.
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */

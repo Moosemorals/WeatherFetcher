@@ -26,6 +26,7 @@ package com.moosemorals.weather.types;
 import org.joda.time.LocalTime;
 
 /**
+ * Sunrise, Sunset, Moonrise, Moonset for a location/date pair.
  *
  * @author osric
  */
@@ -36,18 +37,40 @@ public class Astronomy {
     private final LocalTime moonrise;
     private final LocalTime moonset;
 
+    /**
+     * Time of sunrise (local time).
+     *
+     * @return LocalTime time of sunrise
+     */
     public LocalTime getSunrise() {
         return sunrise;
     }
 
+    /**
+     * Time of sunset (local time).
+     *
+     * @return LocalTime time of sunset
+     */
     public LocalTime getSunset() {
         return sunset;
     }
 
+    /**
+     * Time of moonrise (local time). Will be null when the moon doesn't rise on
+     * the given day.
+     *
+     * @return LocalTime Time of moonrise, or null if there is no moonrise
+     */
     public LocalTime getMoonrise() {
         return moonrise;
     }
 
+    /**
+     * Time of moonset (local time). Will be null when the moon doesn't set on
+     * the given day.
+     *
+     * @return LocalTime Time of moonrise, or null if there is no moonset
+     */
     public LocalTime getMoonset() {
         return moonset;
     }
@@ -59,6 +82,9 @@ public class Astronomy {
         this.moonset = moonset;
     }
 
+    /**
+     * Build an Astronomy data class. Not really useful to end users.
+     */
     public static class Builder {
 
         private LocalTime sunrise;

@@ -24,6 +24,7 @@
 package com.moosemorals.weather.types;
 
 /**
+ * Result of fetching weather data.
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
@@ -33,20 +34,46 @@ public class FetchResult {
     private final int requestsPerSecond;
     private final int requestsPerDay;
 
+    /**
+     * Construct new FetchResult. Not really useful to end users.
+     *
+     * @param report
+     * @param requestsPerSecond
+     * @param requestsPerDay
+     */
     public FetchResult(WeatherReport report, int requestsPerSecond, int requestsPerDay) {
         this.report = report;
         this.requestsPerSecond = requestsPerSecond;
         this.requestsPerDay = requestsPerDay;
     }
 
+    /**
+     * Weather report.
+     *
+     * @return
+     */
     public WeatherReport getReport() {
         return report;
     }
 
+    /**
+     * How many requests you have available this second. The API restricts users
+     * to 5 requests per second, and reports the number available after each
+     * request..
+     *
+     * @return int request left this second
+     */
     public int getRequestsPerSecond() {
         return requestsPerSecond;
     }
 
+    /**
+     * How many requests you have available this day. The API restricts users to
+     * 250 requests per day, and reports the number available after each
+     * request..
+     *
+     * @return int request left this day
+     */
     public int getRequestsPerDay() {
         return requestsPerDay;
     }

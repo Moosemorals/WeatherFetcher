@@ -24,6 +24,7 @@
 package com.moosemorals.weather.types;
 
 /**
+ * Confirmation from the API of the location that was requested.
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
@@ -32,19 +33,32 @@ public class Location {
     private final String name;
     private final String type;
 
-    public Location(String name, String type) {
+    private Location(String name, String type) {
         this.name = name;
         this.type = type;
     }
 
+    /**
+     * Name of the location.
+     *
+     * @return String name of the location
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Type of the location. Something like "UK Postcode" or "City".
+     *
+     * @return String type of location
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Build a new Location. Not really useful to end users.
+     */
     public static class Builder {
 
         private String name;

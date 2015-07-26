@@ -21,40 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.moosemorals.weather.types;
-
 /**
- * Error report from the API.
- *
- * @author Osric Wilkinson <osric@fluffypeople.com>
+ * XML parsers. Not really useful to end users.
  */
-public class ErrorReport {
-
-    private final String type;
-    private final String message;
-
-    public ErrorReport(String type, String message) {
-
-        this.type = type;
-        this.message = message;
-    }
-
-    /**
-     * Type of error.
-     *
-     * @return String type of error
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Human readable explanation of message.
-     *
-     * @return String error message
-     */
-    public String getMessage() {
-        return message;
-    }
-
-}
+package com.moosemorals.weather.xml;

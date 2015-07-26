@@ -127,16 +127,16 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     builder.setWeatherDesc(readTag(parser, "weatherDesc").trim());
                     break;
                 case "windspeedMiles":
-                    builder.setWindspeedMPH(readIntTag(parser, "windspeedMiles"));
+                    builder.setWindspeedMiles(readIntTag(parser, "windspeedMiles"));
                     break;
                 case "windspeedKmph":
-                    builder.setWindspeedKPH(readIntTag(parser, "windspeedKmph"));
+                    builder.setWindspeedKmph(readIntTag(parser, "windspeedKmph"));
                     break;
                 case "winddirDegree":
                     builder.setWinddirDegree(readIntTag(parser, "winddirDegree"));
                     break;
                 case "winddir16Point":
-                    builder.setWinddirName(readTag(parser, "winddir16Point"));
+                    builder.setWinddir16Point(readTag(parser, "winddir16Point"));
                     break;
                 case "precipMM":
                     builder.setPrecipMM(readFloatTag(parser, "precipMM"));
@@ -145,10 +145,10 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     builder.setHumidity(readIntTag(parser, "humidity"));
                     break;
                 case "visibility":
-                    builder.setVisibilityKm(readIntTag(parser, "visibility"));
+                    builder.setVisibility(readIntTag(parser, "visibility"));
                     break;
                 case "pressure":
-                    builder.setPressureMb(readIntTag(parser, "pressure"));
+                    builder.setPressure(readIntTag(parser, "pressure"));
                     break;
                 case "cloudcover":
                     builder.setCloudcover(readIntTag(parser, "cloudcover"));
@@ -164,9 +164,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     skipTag(parser);
                     break;
             }
-
         }
-
         return builder.build();
 
     }
