@@ -22,13 +22,13 @@ does nothing to enforce those limits, but does report your usage.
 	final String API_KEY = "...";
 	final String LOCATION = "..."; // Name of a city, a postcode, a zipcode, an IPv4 address, or a lattitude,longitude pair
 	FetchResult result = new Fetcher.Builder()
-		.setApiKey(API_KEY)
-	        .setLocation(LOCATION)
-		.build()
-		.fetch();
+            .setApiKey(API_KEY)
+	    .setLocation(LOCATION) 
+            .build()
+            .fetch();
 
-		WeatherReport report = result.getReport();
-		System.out.println("The temprature in " + LOCATION + " is " + report.getTempC() + "\u00B0C";
+	WeatherReport report = result.getReport();
+	System.out.println("The temprature in " + LOCATION + " is " + report.getCurrent().getTempC() + "\u00B0C";
 
 # Licence
 
