@@ -14,6 +14,12 @@
     <name>Weather Fetcher</name>
     <description>Fetches current and forcast weather from the worldweatheronline.com (v2) api.
     </description>
+    <url>https://github.com/Moosemorals/WeatherFetcher</url>
+    <scm>
+        <url>https://github.com/Moosemorals/WeatherFetcher</url>
+        <connection>scm:git:git@github.com:Moosemorals/WeatherFetcher.git</connection>
+        <developerConnection>scm:git:git@github.com:Moosemorals/WeatherFetcher.git</developerConnection>
+    </scm>
     <build>
         <plugins>
             <plugin>
@@ -34,6 +40,23 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.12</version>
+                <configuration>
+                    <message>Creating site for ${project.version}</message>
+                    <server>github</server>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>site</phase>
                     </execution>
                 </executions>
             </plugin>
