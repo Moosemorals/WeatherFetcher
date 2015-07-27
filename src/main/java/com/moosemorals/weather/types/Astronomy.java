@@ -23,7 +23,7 @@
  */
 package com.moosemorals.weather.types;
 
-import org.joda.time.LocalTime;
+import org.joda.time.DateTime;
 
 /**
  * Sunrise, Sunset, Moonrise, Moonset for a location/date pair.
@@ -32,50 +32,50 @@ import org.joda.time.LocalTime;
  */
 public class Astronomy {
 
-    private final LocalTime sunrise;
-    private final LocalTime sunset;
-    private final LocalTime moonrise;
-    private final LocalTime moonset;
+    private final DateTime sunrise;
+    private final DateTime sunset;
+    private final DateTime moonrise;
+    private final DateTime moonset;
 
     /**
-     * Time of sunrise (local time).
+     * Time of sunrise (with offset time zone).
      *
-     * @return LocalTime time of sunrise
+     * @return DateTime time of sunrise
      */
-    public LocalTime getSunrise() {
+    public DateTime getSunrise() {
         return sunrise;
     }
 
     /**
-     * Time of sunset (local time).
+     * Time of sunset (with offset time zone).
      *
-     * @return LocalTime time of sunset
+     * @return DateTime time of sunset
      */
-    public LocalTime getSunset() {
+    public DateTime getSunset() {
         return sunset;
     }
 
     /**
-     * Time of moonrise (local time). Will be null when the moon doesn't rise on
-     * the given day.
+     * Time of moonrise (with offset time zone). Will be null when the moon
+     * doesn't rise on the given day.
      *
-     * @return LocalTime Time of moonrise, or null if there is no moonrise
+     * @return DateTime Time of moonrise, or null if there is no moonrise
      */
-    public LocalTime getMoonrise() {
+    public DateTime getMoonrise() {
         return moonrise;
     }
 
     /**
-     * Time of moonset (local time). Will be null when the moon doesn't set on
-     * the given day.
+     * Time of moonset (with offset time zone). Will be null when the moon
+     * doesn't set on the given day.
      *
-     * @return LocalTime Time of moonrise, or null if there is no moonset
+     * @return DateTime Time of moonrise, or null if there is no moonset
      */
-    public LocalTime getMoonset() {
+    public DateTime getMoonset() {
         return moonset;
     }
 
-    private Astronomy(LocalTime sunrise, LocalTime sunset, LocalTime moonrise, LocalTime moonset) {
+    private Astronomy(DateTime sunrise, DateTime sunset, DateTime moonrise, DateTime moonset) {
         this.sunrise = sunrise;
         this.sunset = sunset;
         this.moonrise = moonrise;
@@ -87,31 +87,31 @@ public class Astronomy {
      */
     public static class Builder {
 
-        private LocalTime sunrise;
-        private LocalTime sunset;
-        private LocalTime moonrise;
-        private LocalTime moonset;
+        private DateTime sunrise;
+        private DateTime sunset;
+        private DateTime moonrise;
+        private DateTime moonset;
 
         public Builder() {
             super();
         }
 
-        public Builder setSunrise(LocalTime sunrise) {
+        public Builder setSunrise(DateTime sunrise) {
             this.sunrise = sunrise;
             return this;
         }
 
-        public Builder setSunset(LocalTime sunset) {
+        public Builder setSunset(DateTime sunset) {
             this.sunset = sunset;
             return this;
         }
 
-        public Builder setMoonrise(LocalTime moonrise) {
+        public Builder setMoonrise(DateTime moonrise) {
             this.moonrise = moonrise;
             return this;
         }
 
-        public Builder setMoonset(LocalTime moonset) {
+        public Builder setMoonset(DateTime moonset) {
             this.moonset = moonset;
             return this;
         }

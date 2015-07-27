@@ -26,7 +26,11 @@ package com.moosemorals.weather.types;
 import org.joda.time.LocalTime;
 
 /**
- * Current weather at the requested location.
+ * Current weather at the requested location. </p>
+ *
+ * While the class claims current, observations may be several hours old.
+ * Empirically, {@code observationTime} seems to be more-or-less current time,
+ * rather than the time the observation was made.
  *
  * @author osric
  */
@@ -80,18 +84,18 @@ public class Current {
     }
 
     /**
-     * Air temperature, &deg;C.
+     * Current air temperature, &deg;C.
      *
-     * @return int Air temperature, &deg;C
+     * @return int air temperature, &deg;C
      */
     public int getTempC() {
         return tempC;
     }
 
     /**
-     * Air temperature, &deg;F.
+     * Current air temperature, &deg;F.
      *
-     * @return int Air temperature, &deg;F
+     * @return int air temperature, &deg;F
      */
     public int getTempF() {
         return tempF;
@@ -102,7 +106,7 @@ public class Current {
      * human readable strings is available from
      * <a href="http://www.worldweatheronline.com/feed/wwoConditionCodes.xml">http://www.worldweatheronline.com/feed/wwoConditionCodes.xml</a>
      *
-     * @return int current weather code
+     * @return int weather code
      */
     public int getWeatherCode() {
         return weatherCode;
@@ -111,7 +115,7 @@ public class Current {
     /**
      * URL to an icon for the current weather.
      *
-     * @return String url for an icon
+     * @return String icon URL
      */
     public String getWeatherIconUrl() {
         return weatherIconUrl;
@@ -120,97 +124,102 @@ public class Current {
     /**
      * Human readable string to describe the current leather.
      *
-     * @return String describing current weather
+     * @return String current weather
      */
     public String getWeatherDesc() {
         return weatherDesc;
     }
 
     /**
-     * Wind speed in miles per hour.
+     * Current wind speed in miles per hour.
      *
-     * @return int current wind speed in miles per hour
+     * @return int wind speed in miles per hour
      */
     public int getWindspeedMiles() {
         return windspeedMiles;
     }
 
     /**
-     * Wind speed in kilometres per hour.
+     * Current wind speed in kilometres per hour.
      *
-     * @return int current wind speed in kilometres per hour
+     * @return int wind speed in kilometres per hour
      */
     public int getWindspeedKmph() {
         return windspeedKmph;
     }
 
     /**
-     * Wind direction in degrees from North.
+     * Current wind direction in degrees from North.
      *
-     * @return int current wind direction in degrees
+     * @return int wind direction in degrees
      */
     public int getWinddirDegree() {
         return winddirDegree;
     }
 
     /**
-     * Wind direction as compass point.
+     * Current wind direction as compass point.
      *
-     * @return String current wind direction as compass point
+     * @return String wind direction as compass point
      */
     public String getWinddir16Point() {
         return winddir16Point;
     }
 
     /**
-     * Precipitation in mm.
+     * Current precipitation in mm. </p>
      *
-     * @return int current perecipitation in mm
+     * I suspect that actually, this is how much precipitation since the last
+     * observation.
+     *
+     * @return int precipitation in mm
      */
     public float getPrecipMM() {
         return precipMM;
     }
 
     /**
-     * Relative humidity as an integer percent (between 0 and 100).
+     * Current relative humidity as an integer percent (between 0 and 100).
      *
-     * @return int current relative humidity
+     * @return int relative humidity %
      */
     public int getHumidity() {
         return humidity;
     }
 
     /**
-     * Visibility in kilometres (between 0 and 10).
+     * Current visibility in kilometres (between 0 and 10). </p>
      *
-     * @return int current visibility in kilometres
+     * Visibility of 10km should be taken as unlimited visibility.
+     *
+     * @return int visibility in kilometres
      */
     public int getVisibility() {
         return visibility;
     }
 
     /**
-     * Pressure in millibar.
+     * Current atmospheric pressure in millibar.
      *
-     * @return int current pressure in millibar
+     * @return int pressure in millibar
      */
     public int getPressure() {
         return pressure;
     }
 
     /**
-     * Cloud cover as an integer percent (between 0 and 100)
+     * Current cloud cover as an integer percent (between 0 and 100)
      *
-     * @return int current cloud cover
+     * @return int cloud cover %
      */
     public int getCloudcover() {
         return cloudcover;
     }
 
     /**
-     * "Feels Like" or apparent temperature &deg;C. Calculated (using unknown
-     * algorithm) based on actual temperature, relative humidity, and wind
-     * speed.
+     * Current "Feels Like" or apparent temperature &deg;C. Calculated(using an
+     * unknown algorithm that is apparently based on actual temperature,
+     * relative humidity, and wind speed.
      *
      * @return int "Feels Like" temperature, &deg;C
      */
@@ -219,9 +228,9 @@ public class Current {
     }
 
     /**
-     * "Feels Like" or apparent temperature &deg;F. Calculated (using unknown
-     * algorithm) based on actual temperature, relative humidity, and wind
-     * speed.
+     * Current "Feels Like" or apparent temperature &deg;F. Calculated(using an
+     * unknown algorithm that is apparently based on actual temperature,
+     * relative humidity, and wind speed.
      *
      * @return int "Feels Like" temperature, &deg;F
      */

@@ -36,14 +36,16 @@ public class WeatherReport {
 
     private final Location location;
     private final Current current;
-    private final List<Forecast> forecast;
+    private final List<DailyForecast> forecastDays;
+    private final List<HourlyForecast> forecastHours;
     private final DateTime when;
     private final ErrorReport error;
 
-    public WeatherReport(Location location, Current current, List<Forecast> forecast, DateTime when, ErrorReport error) {
+    public WeatherReport(Location location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, ErrorReport error) {
         this.location = location;
         this.current = current;
-        this.forecast = forecast;
+        this.forecastDays = forecastDays;
+        this.forecastHours = forecastHours;
         this.when = when;
         this.error = error;
     }
@@ -64,24 +66,33 @@ public class WeatherReport {
         return current;
     }
 
-    public List<Forecast> getForecasts() {
-        return forecast;
+    public List<DailyForecast> getDailyForecasts() {
+        return forecastDays;
+    }
+
+    public List<HourlyForecast> getHourlyForecasts() {
+        return forecastHours;
     }
 
     public DateTime getLocalTime() {
         return when;
     }
 
+    /**
+     * Build a new WeatherReport. Not really useful to end users.
+     */
     public static class Builder {
 
         private Location location;
         private Current current;
-        private final List<Forecast> forecast;
+        private final List<DailyForecast> forecastDays;
+        private final List<HourlyForecast> forecastHours;
         private DateTime when;
         private ErrorReport error;
 
         public Builder() {
-            forecast = new ArrayList<>();
+            forecastDays = new ArrayList<>();
+            forecastHours = new ArrayList<>();
         }
 
         public Builder setLocation(Location location) {
@@ -94,8 +105,13 @@ public class WeatherReport {
             return this;
         }
 
-        public Builder addForecast(Forecast forecast) {
-            this.forecast.add(forecast);
+        public Builder addDailyForecast(DailyForecast forecast) {
+            this.forecastDays.add(forecast);
+            return this;
+        }
+
+        public Builder addHourlyForecast(HourlyForecast forecast) {
+            this.forecastHours.add(forecast);
             return this;
         }
 
@@ -111,9 +127,9 @@ public class WeatherReport {
 
         public WeatherReport build() {
             if (error == null) {
-                return new WeatherReport(location, current, forecast, when, null);
+                return new WeatherReport(location, current, forecastDays, forecastHours, when, null);
             } else {
-                return new WeatherReport(null, null, null, null, error);
+                return new WeatherReport(null, null, null, null, null, error);
             }
         }
     }

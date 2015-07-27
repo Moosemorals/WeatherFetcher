@@ -94,7 +94,7 @@ public class Fetcher {
      * Throws IOException for problems. Potential problems include network
      * issues (can't connect to the API) or API issues (Missing/invalid API key)
      *
-     * @return WeatherReport containg current data
+     * @return WeatherReport containing current data
      * @throws IOException if there are network problems, or the api request is
      */
     public FetchResult fetch() throws IOException {
@@ -110,7 +110,6 @@ public class Fetcher {
         Map<String, String> param = new HashMap<>();
 
         param.put("q", location);
-        param.put("key", "HIDDEN");
         param.put("extra", "utcDateTime");
         param.put("num_of_days", Integer.toString(num_of_days));
         param.put("tp", Integer.toString(timePeriod));
@@ -126,8 +125,11 @@ public class Fetcher {
             param.put("cc", "no");
         }
 
+        // For logging, build the request with a hidden api key
+        param.put("key", "HIDDEN");
         String loggableTarget = Util.assembleURL(Fetcher.ENDPOINT, Util.flattenMap(param));
 
+        // For live use, build the request with the real api.
         param.put("key", apiKey);
         String target = Util.assembleURL(Fetcher.ENDPOINT, Util.flattenMap(param));
 

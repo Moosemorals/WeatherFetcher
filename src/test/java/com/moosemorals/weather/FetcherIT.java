@@ -24,7 +24,6 @@
 package com.moosemorals.weather;
 
 import com.moosemorals.weather.types.FetchResult;
-import com.moosemorals.weather.types.Forecast;
 import com.moosemorals.weather.types.WeatherReport;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -101,10 +100,8 @@ public class FetcherIT {
         WeatherReport report = result.getReport();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
-        assertEquals(report.getForecasts().size(), 3, "Should have 3 days of reports");
-        for (Forecast f : report.getForecasts()) {
-            assertEquals(f.getHourly().size(), 8, "Shoulr have 8 reports/day");
-        }
+        assertEquals(report.getDailyForecasts().size(), 3, "Should have 3 daily forecasts");
+        assertEquals(report.getHourlyForecasts().size(), 8 * 3, "Should have 8 reports/day for 3 days");
 
         // Newcastle is in the Europe/London timezone.
         // Turns out the server clock isn't good enough to test this.
@@ -129,7 +126,8 @@ public class FetcherIT {
         WeatherReport report = result.getReport();
         assertNotNull(report, "Report should not be null");
         assertEquals(report.getCurrent(), null, "Current should be null");
-        assertTrue(report.getForecasts().isEmpty(), "Should have no forecast");
+        assertTrue(report.getDailyForecasts().isEmpty(), "Should have no daily forecast");
+        assertTrue(report.getHourlyForecasts().isEmpty(), "Should have no hourly forecast");
     }
 
     @Test
@@ -148,10 +146,9 @@ public class FetcherIT {
         WeatherReport report = result.getReport();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
-        assertEquals(report.getForecasts().size(), 1, "Should have 1 day of reports");
-        for (Forecast f : report.getForecasts()) {
-            assertEquals(f.getHourly().size(), 8, "Should have 8 reports/day");
-        }
+        assertEquals(report.getDailyForecasts().size(), 1, "Should have 1 daily forecasts");
+        assertEquals(report.getHourlyForecasts().size(), 8 * 1, "Should have 8 reports/day for 1 day");
+
     }
 
     @Test
@@ -170,10 +167,9 @@ public class FetcherIT {
         WeatherReport report = result.getReport();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
-        assertEquals(report.getForecasts().size(), 3, "Should have 1 day of reports");
-        for (Forecast f : report.getForecasts()) {
-            assertEquals(f.getHourly().size(), 4, "Should have 4 reports/day");
-        }
+        assertEquals(report.getDailyForecasts().size(), 3, "Should have 3 daily forecasts");
+        assertEquals(report.getHourlyForecasts().size(), 4 * 3, "Should have 4 reports/day for 3 days");
+
     }
 
     private static String loadAPIKey(InputStream in) throws Exception {

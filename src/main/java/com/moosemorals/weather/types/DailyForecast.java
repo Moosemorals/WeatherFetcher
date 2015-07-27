@@ -23,26 +23,24 @@
  */
 package com.moosemorals.weather.types;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
 
 /**
+ * Daily weather forecast for a location.
  *
  * @author osric
  */
-public class Forecast {
+public class DailyForecast {
 
-    private final LocalDate date;
+    private final DateTime date;
     private final int maxTempC;
     private final int maxTempF;
     private final int minTempC;
     private final int minTempF;
     private final int uvIndex;
     private final Astronomy astronomy;
-    private final List<Hour> hourly;
 
-    public Forecast(LocalDate date, int maxTempC, int maxTempF, int minTempC, int minTempF, int uvIndex, Astronomy astronomy, List<Hour> hourly) {
+    private DailyForecast(DateTime date, int maxTempC, int maxTempF, int minTempC, int minTempF, int uvIndex, Astronomy astronomy) {
         this.date = date;
         this.maxTempC = maxTempC;
         this.maxTempF = maxTempF;
@@ -50,57 +48,88 @@ public class Forecast {
         this.minTempF = minTempF;
         this.uvIndex = uvIndex;
         this.astronomy = astronomy;
-        this.hourly = hourly;
     }
 
-    public LocalDate getDate() {
+    /**
+     * Day the forecast is for, with offset time zone.
+     *
+     * @return
+     */
+    public DateTime getDate() {
         return date;
     }
 
+    /**
+     * Predicted maximum daytime air temperature, &deg;C.
+     *
+     * @return int predicted max temperature, &deg;C
+     */
     public int getMaxTempC() {
         return maxTempC;
     }
 
+    /**
+     * Predicted maximum daytime air temperature, &deg;F.
+     *
+     * @return int predicted max temperature, &deg;F
+     */
     public int getMaxTempF() {
         return maxTempF;
     }
 
+    /**
+     * Predicted minimum nighttime air temperature, &deg;C.
+     *
+     * @return int predicted min temperature, &deg;C
+     */
     public int getMinTempC() {
         return minTempC;
     }
 
+    /**
+     * Predicted minimum nighttime air temperature, &deg;C.
+     *
+     * @return int predicted min temperature, &deg;C
+     */
     public int getMinTempF() {
         return minTempF;
     }
 
+    /**
+     * Predicted UV Index.
+     *
+     * @return int predicted UV index
+     */
     public int getUvIndex() {
         return uvIndex;
     }
 
+    /**
+     * Sunrise/set, Moonrise/set.
+     *
+     * @return Astronomy data object holding sunrise/set, moonrise/set
+     */
     public Astronomy getAstronomy() {
         return astronomy;
     }
 
-    public List<Hour> getHourly() {
-        return hourly;
-    }
-
+    /**
+     * Build a DailyForecast. Not really useful to end users.
+     */
     public static class Builder {
 
-        private LocalDate date;
+        private DateTime date;
         private int maxTempC;
         private int maxTempF;
         private int minTempC;
         private int minTempF;
         private int uvIndex;
         private Astronomy astronomy;
-        private final List<Hour> hourly;
 
         public Builder() {
-            hourly = new ArrayList<>();
         }
 
-        public Builder setDate(LocalDate date) {
+        public Builder setDate(DateTime date) {
             this.date = date;
             return this;
         }
@@ -135,13 +164,8 @@ public class Forecast {
             return this;
         }
 
-        public Builder addHour(Hour hour) {
-            this.hourly.add(hour);
-            return this;
-        }
-
-        public Forecast build() {
-            return new Forecast(date, maxTempC, maxTempF, minTempC, minTempF, uvIndex, astronomy, hourly);
+        public DailyForecast build() {
+            return new DailyForecast(date, maxTempC, maxTempF, minTempC, minTempF, uvIndex, astronomy);
         }
     }
 

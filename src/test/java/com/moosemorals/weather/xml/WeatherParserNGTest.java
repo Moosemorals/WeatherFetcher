@@ -25,18 +25,18 @@ package com.moosemorals.weather.xml;
 
 import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
-import com.moosemorals.weather.types.Forecast;
-import com.moosemorals.weather.types.Hour;
+import com.moosemorals.weather.types.DailyForecast;
+import com.moosemorals.weather.types.HourlyForecast;
 import com.moosemorals.weather.types.Location;
 import com.moosemorals.weather.types.WeatherReport;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class WeatherParserNGTest {
 
         assertNotNull(report);
         assertNotNull(report.getCurrent());
-        assertNotEquals(report.getForecasts().size(), 3);
+        assertNotEquals(report.getDailyForecasts().size(), 3);
         DateTime when = new DateTime(2015, 7, 25, 11, 01, 0, DateTimeZone.forOffsetHours(1));
 
         assertEquals(report.getLocalTime(), when);
@@ -109,9 +109,9 @@ public class WeatherParserNGTest {
     public void forecasts() throws Exception {
         WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
 
-        Forecast forecast = report.getForecasts().get(0);
+        DailyForecast forecast = report.getDailyForecasts().get(0);
 
-        assertEquals(forecast.getDate(), new LocalDate(2015, 7, 25));
+        assertEquals(forecast.getDate(), new DateTime(2015, 7, 25, 0, 0, 0, DateTimeZone.forOffsetHours(1)));
 
         assertEquals(forecast.getMaxTempC(), 18);
         assertEquals(forecast.getMaxTempF(), 64);
@@ -124,26 +124,26 @@ public class WeatherParserNGTest {
     public void astronomy() throws Exception {
         WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
 
-        Forecast forecast = report.getForecasts().get(0);
+        DailyForecast forecast = report.getDailyForecasts().get(0);
 
         Astronomy astronomy = forecast.getAstronomy();
         assertNotNull(astronomy);
 
-        assertEquals(astronomy.getSunrise(), new LocalTime(5, 2));
-        assertEquals(astronomy.getSunset(), new LocalTime(21, 22));
-        assertEquals(astronomy.getMoonrise(), new LocalTime(15, 26));
-        assertEquals(astronomy.getMoonset(), new LocalTime(0, 22));
+        assertEquals(astronomy.getSunrise(), new DateTime(2015, 7, 25, 5, 2, 0, DateTimeZone.forOffsetHours(1)));
+        assertEquals(astronomy.getSunset(), new DateTime(2015, 7, 25, 21, 22, 0, DateTimeZone.forOffsetHours(1)));
+        assertEquals(astronomy.getMoonrise(), new DateTime(2015, 7, 25, 15, 26, 0, DateTimeZone.forOffsetHours(1)));
+        assertEquals(astronomy.getMoonset(), new DateTime(2015, 7, 25, 0, 22, 0, DateTimeZone.forOffsetHours(1)));
     }
 
     @Test
     public void hourly() throws Exception {
         WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
 
-        Forecast forecast = report.getForecasts().get(0);
+        List<HourlyForecast> forecasts = report.getHourlyForecasts();
 
-        assertEquals(forecast.getHourly().size(), 8);
+        assertEquals(forecasts.size(), 8 * 5);
 
-        Hour hour = forecast.getHourly().get(0);
+        HourlyForecast hour = forecasts.get(0);
 
         assertEquals(hour.getTime(), new DateTime(2015, 7, 25, 0, 0, 0, DateTimeZone.UTC));
 
@@ -157,7 +157,7 @@ public class WeatherParserNGTest {
         assertEquals(hour.getPrecipMM(), 0.0, 0.001);
         assertEquals(hour.getHumidity(), 84);
         assertEquals(hour.getVisibility(), 10);
-        assertEquals(hour.getPressureMb(), 1011);
+        assertEquals(hour.getPressure(), 1011);
         assertEquals(hour.getCloudcover(), 21);
 
         assertEquals(hour.getHeatIndexC(), 11);
@@ -177,10 +177,8 @@ public class WeatherParserNGTest {
     public void parse_sample_from_fetcher() throws Exception {
         WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-from-fetcher.xml"));
 
-        assertEquals(report.getForecasts().size(), 3);
-        for (Forecast f : report.getForecasts()) {
-            assertEquals(f.getHourly().size(), 8);
-        }
+        assertEquals(report.getDailyForecasts().size(), 3);
+        assertEquals(report.getHourlyForecasts().size(), 8 * 3);
     }
 
     @Test

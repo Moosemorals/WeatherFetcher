@@ -26,30 +26,26 @@ package com.moosemorals.weather.types;
 import org.joda.time.DateTime;
 
 /**
+ * Predicted weather for an hour.
  *
  * @author osric
  */
-public class Hour {
+public class HourlyForecast {
 
     private final DateTime time;
     private final int tempC;
     private final int tempF;
     private final int windspeedMiles;
     private final int windspeedKPH;
-    private final int windspeedKnots;
-    private final int windspeedMPS;
     private final int winddirDegree;
     private final String winddir16Point;
     private final int weatherCode;
     private final String weatherDesc;
     private final String weatherIconUrl;
     private final float precipMM;
-    private final float precipInches;
     private final int humidity;
     private final int visibility;
-    private final int VisiblityMiles;
     private final int pressureMb;
-    private final int pressureInches;
     private final int cloudcover;
     private final int heatIndexC;
     private final int heatIndexF;
@@ -72,186 +68,379 @@ public class Hour {
     private final int chanceOfRemdry;
     private final int chanceOfHightemp;
 
+    /**
+     * Hour that the forecast is for, UTC.
+     *
+     * @return DateTime target hour
+     */
     public DateTime getTime() {
         return time;
     }
 
+    /**
+     * Predicted air temperature, &deg;C.
+     *
+     * @return int Air temperature, &deg;C
+     */
     public int getTempC() {
         return tempC;
     }
 
+    /**
+     * Predicted air temperature, &deg;F.
+     *
+     * @return int Air temperature, &deg;F
+     */
     public int getTempF() {
         return tempF;
     }
 
+    /**
+     * Current wind speed in miles per hour.
+     *
+     * @return int wind speed in miles per hour
+     */
     public int getWindspeedMiles() {
         return windspeedMiles;
     }
 
-    public int getWindspeedKPH() {
+    /**
+     * Current wind speed in kilometres per hour.
+     *
+     * @return int wind speed in kilometres per hour
+     */
+    public int getWindspeedKmph() {
         return windspeedKPH;
     }
 
-    public int getWindspeedKnots() {
-        return windspeedKnots;
-    }
-
-    public int getWindspeedMPS() {
-        return windspeedMPS;
-    }
-
+    /**
+     * Predicted wind direction in degrees from North.
+     *
+     * @return int wind direction in degrees
+     */
     public int getWinddirDegree() {
         return winddirDegree;
     }
 
+    /**
+     * Predicted wind direction as compass point.
+     *
+     * @return String wind direction as compass point
+     */
     public String getWinddir16Point() {
         return winddir16Point;
     }
 
+    /**
+     * (Arbitrary) code to describe the predicted weather. A list of code <->
+     * human readable strings is available from
+     * <a href="http://www.worldweatheronline.com/feed/wwoConditionCodes.xml">http://www.worldweatheronline.com/feed/wwoConditionCodes.xml</a>
+     *
+     * @return int weather code
+     */
     public int getWeatherCode() {
         return weatherCode;
     }
 
+    /**
+     * Human readable string to describe the predicted leather.
+     *
+     * @return String current weather
+     */
     public String getWeatherDesc() {
         return weatherDesc;
     }
 
+    /**
+     * URL to an icon for the predicted weather.
+     *
+     * @return String icon URL
+     */
     public String getWeatherIconUrl() {
         return weatherIconUrl;
     }
 
+    /**
+     * Predicted precipitation in mm. </p>
+     *
+     * I suspect that actually, this is how much precipitation since the last
+     * observation.
+     *
+     * @return int precipitation in mm
+     */
     public float getPrecipMM() {
         return precipMM;
     }
 
-    public float getPrecipInches() {
-        return precipInches;
-    }
-
+    /**
+     * Predicted relative humidity as an integer percent (between 0 and 100).
+     *
+     * @return int relative humidity %
+     */
     public int getHumidity() {
         return humidity;
     }
 
+    /**
+     * Predicted visibility in kilometres (between 0 and 10). </p>
+     *
+     * Visibility of 10km should be taken as unlimited visibility.
+     *
+     * @return int visibility in kilometres
+     */
     public int getVisibility() {
         return visibility;
     }
 
-    public int getVisiblityMiles() {
-        return VisiblityMiles;
-    }
-
-    public int getPressureMb() {
+    /**
+     * Predicted atmospheric pressure in millibar.
+     *
+     * @return int pressure in millibar
+     */
+    public int getPressure() {
         return pressureMb;
     }
 
-    public int getPressureInches() {
-        return pressureInches;
-    }
-
+    /**
+     * Predicted cloud cover as an integer percent (between 0 and 100)
+     *
+     * @return int cloud cover %
+     */
     public int getCloudcover() {
         return cloudcover;
     }
 
+    /**
+     * Predicted heat index, &deg;C. </p>
+     *
+     * Combines temperature and humidity to suggest how hot it would feel in
+     * dryer air. </p>
+     *
+     * For more on heat index see
+     * <a href="https://en.wikipedia.org/wiki/Heat_index">Wikipeida article</a>.
+     *
+     * @return int heat index, &deg;C
+     */
     public int getHeatIndexC() {
         return heatIndexC;
     }
 
+    /**
+     * Predicted heat index, &deg;F. </p>
+     *
+     * Combines temperature and humidity to suggest how hot it would feel in
+     * dryer air. </p>
+     *
+     * For more on heat index see
+     * <a href="https://en.wikipedia.org/wiki/Heat_index">Wikipeida article</a>.
+     *
+     * @return int heat index, &deg;F
+     */
     public int getHeatIndexF() {
         return heatIndexF;
     }
 
+    /**
+     * Predicted dew point, &deg;C. </p>
+     *
+     * What temperature do you need to cool the air too, to reach 100% relative
+     * humidity?
+     *
+     * @return int dew point, &deg;C
+     */
     public int getDewPointC() {
         return dewPointC;
     }
 
+    /**
+     * Predicted dew point, &deg;F. </p>
+     *
+     * What temperature do you need to cool the air too, to reach 100% relative
+     * humidity?
+     *
+     * @return int dew point, &deg;F
+     */
     public int getDewPointF() {
         return dewPointF;
     }
 
+    /**
+     * Predicted wind chill, &deg;C. </p>
+     *
+     * Wind chill is the "perceived decrease in air temperature felt by the body
+     * on exposed skin due to the flow of air"
+     * (<a href="https://en.wikipedia.org/wiki/Wind_chill">Wikipedia
+     * article</a>)
+     *
+     * @return int wind chill, &deg;C
+     */
     public int getWindChillC() {
         return windChillC;
     }
 
+    /**
+     * Predicted wind chill, &deg;C. </p>
+     *
+     * Wind chill is the "perceived decrease in air temperature felt by the body
+     * on exposed skin due to the flow of air"
+     * (<a href="https://en.wikipedia.org/wiki/Wind_chill">Wikipedia
+     * article</a>)
+     *
+     * @return int wind chill, &deg;C
+     */
     public int getWindChillF() {
         return windChillF;
     }
 
+    /**
+     * Predicted wind gust speeds, miles per hour.
+     *
+     * @return int wind gust speed, miles per hour
+     */
     public int getWindGustMiles() {
         return windGustMiles;
     }
 
+    /**
+     * Predicted wind gust speeds, kilometres per hour.
+     *
+     * @return int wind gust speed, kilometres per hour
+     */
     public int getWindGustKmph() {
         return windGustKmph;
     }
 
+    /**
+     * Predicted "Feels Like" or apparent temperature &deg;C. Calculated(using
+     * an unknown algorithm that is apparently based on actual temperature,
+     * relative humidity, and wind speed.
+     *
+     * @return int "Feels Like" temperature, &deg;C
+     */
     public int getFeelsLikeC() {
         return feelsLikeC;
     }
 
+    /**
+     * Predicted "Feels Like" or apparent temperature &deg;F. Calculated(using
+     * an unknown algorithm that is apparently based on actual temperature,
+     * relative humidity, and wind speed.
+     *
+     * @return int "Feels Like" temperature, &deg;F
+     */
     public int getFeelsLikeF() {
         return feelsLikeF;
     }
 
+    /**
+     * Predicted chance of rain as an integer percent (between 0 and 100).
+     *
+     * @return int chance of rain %
+     */
     public int getChanceOfRain() {
         return chanceOfRain;
     }
 
+    /**
+     * Predicted chance of wind as an integer percent (between 0 and 100).
+     *
+     * @return int chance of wind %
+     */
     public int getChanceOfWindy() {
         return chanceOfWindy;
     }
 
+    /**
+     * Predicted chance of overcast as an integer percent (between 0 and 100).
+     *
+     * @return int chance of overcast %
+     */
     public int getChanceOfOvercast() {
         return chanceOfOvercast;
     }
 
+    /**
+     * Predicted chance of sunny as an integer percent (between 0 and 100).
+     *
+     * @return int chance of sunny %
+     */
     public int getChanceOfSunny() {
         return chanceOfSunny;
     }
 
+    /**
+     * Predicted chance of frost as an integer percent (between 0 and 100).
+     *
+     * @return int chance of frost %
+     */
     public int getChanceOfFrost() {
         return chanceOfFrost;
     }
 
+    /**
+     * Predicted chance of fog as an integer percent (between 0 and 100).
+     *
+     * @return int chance of fog %
+     */
     public int getChanceOfFog() {
         return chanceOfFog;
     }
 
+    /**
+     * Predicted chance of snow as an integer percent (between 0 and 100).
+     *
+     * @return int chance of snow %
+     */
     public int getChanceofSnow() {
         return chanceofSnow;
     }
 
+    /**
+     * Predicted chance of thunder as an integer percent (between 0 and 100).
+     *
+     * @return int chance of thunder %
+     */
     public int getChanceOfThunder() {
         return chanceOfThunder;
     }
 
+    /**
+     * Predicted chance of remaining dry as an integer percent (between 0 and
+     * 100). </p>
+     *
+     * I'm not sure what this one is. Its not (1 - chance of rain).
+     *
+     * @return int chance of remaining dry %
+     */
     public int getChanceOfRemdry() {
         return chanceOfRemdry;
     }
 
+    /**
+     * Predicted chance of high temperatures as an integer percent (between 0
+     * and 100).
+     *
+     * @return int chance of high temperature %
+     */
     public int getChanceOfHightemp() {
         return chanceOfHightemp;
     }
 
-    protected Hour(DateTime time, int tempC, int tempF, int windspeedMiles, int windspeedKPH, int windspeedKnots, int windspeedMPS, int winddirDegree, String winddir16Point, int weatherCode, String weatherDesc, String weatherIconUrl, float precipMM, float precipInches, int humidity, int visibility, int VisiblityMiles, int pressureMb, int pressureInches, int cloudcover, int heatIndexC, int heatIndexF, int dewPointC, int dewPointF, int windChillC, int windChillF, int windGustMiles, int windGustKmph, int feelsLikeC, int feelsLikeF, int chanceOfRain, int chanceOfWindy, int chanceOfOvercast, int chanceOfSunny, int chanceOfFrost, int chanceOfFog, int chanceofSnow, int chanceOfThunder, int chanceOfRemdry, int chanceOfHightemp) {
+    public HourlyForecast(DateTime time, int tempC, int tempF, int windspeedMiles, int windspeedKPH, int winddirDegree, String winddir16Point, int weatherCode, String weatherDesc, String weatherIconUrl, float precipMM, int humidity, int visibility, int pressureMb, int cloudcover, int heatIndexC, int heatIndexF, int dewPointC, int dewPointF, int windChillC, int windChillF, int windGustMiles, int windGustKmph, int feelsLikeC, int feelsLikeF, int chanceOfRain, int chanceOfWindy, int chanceOfOvercast, int chanceOfSunny, int chanceOfFrost, int chanceOfFog, int chanceofSnow, int chanceOfThunder, int chanceOfRemdry, int chanceOfHightemp) {
         this.time = time;
         this.tempC = tempC;
         this.tempF = tempF;
         this.windspeedMiles = windspeedMiles;
         this.windspeedKPH = windspeedKPH;
-        this.windspeedKnots = windspeedKnots;
-        this.windspeedMPS = windspeedMPS;
         this.winddirDegree = winddirDegree;
         this.winddir16Point = winddir16Point;
         this.weatherCode = weatherCode;
         this.weatherDesc = weatherDesc;
         this.weatherIconUrl = weatherIconUrl;
         this.precipMM = precipMM;
-        this.precipInches = precipInches;
         this.humidity = humidity;
         this.visibility = visibility;
-        this.VisiblityMiles = VisiblityMiles;
         this.pressureMb = pressureMb;
-        this.pressureInches = pressureInches;
         this.cloudcover = cloudcover;
         this.heatIndexC = heatIndexC;
         this.heatIndexF = heatIndexF;
@@ -275,6 +464,9 @@ public class Hour {
         this.chanceOfHightemp = chanceOfHightemp;
     }
 
+    /**
+     * Build an hourly forecast. Not much use to end users.
+     */
     public static class Builder {
 
         private DateTime time;
@@ -282,20 +474,15 @@ public class Hour {
         private int tempF;
         private int windspeedMiles;
         private int windspeedKPH;
-        private int windspeedKnots;
-        private int windspeedMPS;
         private int winddirDegree;
         private String winddir16Point;
         private int weatherCode;
         private String weatherDesc;
         private String weatherIconUrl;
         private float precipMM;
-        private float precipInches;
         private int humidity;
         private int visibility;
-        private int VisiblityMiles;
         private int pressureMb;
-        private int pressureInches;
         private int cloudcover;
         private int heatIndexC;
         private int heatIndexF;
@@ -347,16 +534,6 @@ public class Hour {
             return this;
         }
 
-        public Builder setWindspeedKnots(int windspeedKnots) {
-            this.windspeedKnots = windspeedKnots;
-            return this;
-        }
-
-        public Builder setWindspeedMPS(int windspeedMPS) {
-            this.windspeedMPS = windspeedMPS;
-            return this;
-        }
-
         public Builder setWinddirDegree(int winddirDegree) {
             this.winddirDegree = winddirDegree;
             return this;
@@ -387,11 +564,6 @@ public class Hour {
             return this;
         }
 
-        public Builder setPrecipInches(float precipInches) {
-            this.precipInches = precipInches;
-            return this;
-        }
-
         public Builder setHumidity(int humidity) {
             this.humidity = humidity;
             return this;
@@ -402,18 +574,8 @@ public class Hour {
             return this;
         }
 
-        public Builder setVisiblityMiles(int VisiblityMiles) {
-            this.VisiblityMiles = VisiblityMiles;
-            return this;
-        }
-
         public Builder setPressureMb(int pressureMb) {
             this.pressureMb = pressureMb;
-            return this;
-        }
-
-        public Builder setPressureInches(int pressureInches) {
-            this.pressureInches = pressureInches;
             return this;
         }
 
@@ -522,8 +684,8 @@ public class Hour {
             return this;
         }
 
-        public Hour build() {
-            return new Hour(time, tempC, tempF, windspeedMiles, windspeedKPH, windspeedKnots, windspeedMPS, winddirDegree, winddir16Point, weatherCode, weatherDesc, weatherIconUrl, precipMM, precipInches, humidity, visibility, VisiblityMiles, pressureMb, pressureInches, cloudcover, heatIndexC, heatIndexF, dewPointC, dewPointF, windChillC, windChillF, windGustMiles, windGustKmph, feelsLikeC, feelsLikeF, chanceOfRain, chanceOfWindy, chanceOfOvercast, chanceOfSunny, chanceOfFrost, chanceOfFog, chanceofSnow, chanceOfThunder, chanceOfRemdry, chanceOfHightemp);
+        public HourlyForecast build() {
+            return new HourlyForecast(time, tempC, tempF, windspeedMiles, windspeedKPH, winddirDegree, winddir16Point, weatherCode, weatherDesc, weatherIconUrl, precipMM, humidity, visibility, pressureMb, cloudcover, heatIndexC, heatIndexF, dewPointC, dewPointF, windChillC, windChillF, windGustMiles, windGustKmph, feelsLikeC, feelsLikeF, chanceOfRain, chanceOfWindy, chanceOfOvercast, chanceOfSunny, chanceOfFrost, chanceOfFog, chanceofSnow, chanceOfThunder, chanceOfRemdry, chanceOfHightemp);
         }
     }
 

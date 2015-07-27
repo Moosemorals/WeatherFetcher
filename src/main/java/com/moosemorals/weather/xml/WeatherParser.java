@@ -25,9 +25,9 @@ package com.moosemorals.weather.xml;
 
 import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
+import com.moosemorals.weather.types.DailyForecast;
 import com.moosemorals.weather.types.ErrorReport;
-import com.moosemorals.weather.types.Forecast;
-import com.moosemorals.weather.types.Hour;
+import com.moosemorals.weather.types.HourlyForecast;
 import com.moosemorals.weather.types.Location;
 import com.moosemorals.weather.types.WeatherReport;
 import java.io.IOException;
@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Parse XML weather data from worldweatheronline.com API v2.
+ * Parse XML weather data from the World Weather Online v2 API.
  *
  * @author Osric Wilkinson osric@fluffypeople.com
  */
@@ -55,6 +55,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "data");
 
         WeatherReport.Builder builder = new WeatherReport.Builder();
+        DateTime when = null;
 
         while (parser.next() != XMLStreamReader.END_ELEMENT) {
             if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {
@@ -68,14 +69,15 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                 case "request":
                     builder.setLocation(readLocation(parser));
                     break;
+                case "time_zone":
+                    when = readTimeZone(parser);
+                    builder.setWhen(when);
+                    break;
                 case "current_condition":
                     builder.setCurrent(readCurrent(parser));
                     break;
                 case "weather":
-                    builder.addForecast(readForecast(parser));
-                    break;
-                case "time_zone":
-                    builder.setWhen(readTimeZone(parser));
+                    builder.addDailyForecast(readForecast(parser, builder, when));
                     break;
                 default:
                     log.warn("Top: Skiping unexpected tag {}", parser.getLocalName());
@@ -169,12 +171,12 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
     }
 
-    private Forecast readForecast(XMLStreamReader parser) throws XMLStreamException, IOException {
+    private DailyForecast readForecast(XMLStreamReader parser, WeatherReport.Builder reportBuilder, DateTime when) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "weather");
 
-        Forecast.Builder builder = new Forecast.Builder();
+        DailyForecast.Builder builder = new DailyForecast.Builder();
 
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd").withZone(when.getZone());
 
         while (parser.next() != XMLStreamReader.END_ELEMENT) {
             if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {
@@ -183,10 +185,10 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
             switch (parser.getLocalName()) {
                 case "date":
-                    builder.setDate(fmt.parseLocalDate(readTag(parser, "date")));
+                    builder.setDate(fmt.parseDateTime(readTag(parser, "date")));
                     break;
                 case "astronomy":
-                    builder.setAstronomy(readAstronmy(parser));
+                    builder.setAstronomy(readAstronmy(parser, when));
                     break;
                 case "maxtempC":
                     builder.setMaxTempC(readIntTag(parser, "maxtempC"));
@@ -204,7 +206,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     builder.setUvIndex(readIntTag(parser, "uvIndex"));
                     break;
                 case "hourly":
-                    builder.addHour(readHour(parser));
+                    reportBuilder.addHourlyForecast(readHour(parser));
                     break;
                 default:
                     log.warn("Forecast: Skiping unexpected tag {}", parser.getLocalName());
@@ -216,7 +218,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
         return builder.build();
     }
 
-    private Astronomy readAstronmy(XMLStreamReader parser) throws XMLStreamException, IOException {
+    private Astronomy readAstronmy(XMLStreamReader parser, DateTime when) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "astronomy");
 
         Astronomy.Builder builder = new Astronomy.Builder();
@@ -229,11 +231,13 @@ public class WeatherParser extends BaseParser<WeatherReport> {
             }
 
             String raw;
+            LocalTime time;
             switch (parser.getLocalName()) {
                 case "sunrise":
                     raw = readTag(parser, "sunrise");
                     if (!raw.equals("No sunrise")) {
-                        builder.setSunrise(fmt.parseLocalTime(raw));
+                        time = fmt.parseLocalTime(raw);
+                        builder.setSunrise(when.withHourOfDay(time.getHourOfDay()).withMinuteOfHour(time.getMinuteOfHour()));
                     } else {
                         builder.setSunrise(null);
                     }
@@ -241,7 +245,8 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                 case "sunset":
                     raw = readTag(parser, "sunset");
                     if (!raw.equals("No sunset")) {
-                        builder.setSunset(fmt.parseLocalTime(raw));
+                        time = fmt.parseLocalTime(raw);
+                        builder.setSunset(when.withHourOfDay(time.getHourOfDay()).withMinuteOfHour(time.getMinuteOfHour()));
                     } else {
                         builder.setSunset(null);
                     }
@@ -249,7 +254,8 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                 case "moonrise":
                     raw = readTag(parser, "moonrise");
                     if (!raw.equals("No moonrise")) {
-                        builder.setMoonrise(fmt.parseLocalTime(raw));
+                        time = fmt.parseLocalTime(raw);
+                        builder.setMoonrise(when.withHourOfDay(time.getHourOfDay()).withMinuteOfHour(time.getMinuteOfHour()));
                     } else {
                         builder.setMoonrise(null);
                     }
@@ -257,7 +263,8 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                 case "moonset":
                     raw = readTag(parser, "moonset");
                     if (!raw.equals("No moonset")) {
-                        builder.setMoonset(fmt.parseLocalTime(raw));
+                        time = fmt.parseLocalTime(raw);
+                        builder.setMoonset(when.withHourOfDay(time.getHourOfDay()).withMinuteOfHour(time.getMinuteOfHour()));
                     } else {
                         builder.setMoonset(null);
                     }
@@ -272,10 +279,10 @@ public class WeatherParser extends BaseParser<WeatherReport> {
         return builder.build();
     }
 
-    private Hour readHour(XMLStreamReader parser) throws XMLStreamException, IOException {
+    private HourlyForecast readHour(XMLStreamReader parser) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "hourly");
 
-        Hour.Builder builder = new Hour.Builder();
+        HourlyForecast.Builder builder = new HourlyForecast.Builder();
 
         LocalTime utcTime = null;
         DateTime utcDate = null;
