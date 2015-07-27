@@ -41,8 +41,8 @@ import org.joda.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 /**
@@ -62,10 +62,27 @@ public class WeatherParserNGTest {
 
         assertNotNull(report);
         assertNotNull(report.getCurrent());
-        assertNotEquals(report.getDailyForecasts().size(), 3);
+        assertEquals(report.getDailyForecasts().size(), 5);
         DateTime when = new DateTime(2015, 7, 25, 11, 01, 0, DateTimeZone.forOffsetHours(1));
 
-        assertEquals(report.getLocalTime(), when);
+        assertEquals(report.getDate(), when);
+
+        assertEquals(report.getLanguage(), "en");
+    }
+
+    @Test
+    public void language() throws Exception {
+        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-lang-uk.xml"));
+
+        assertEquals(report.getLanguage(), "uk");
+        assertNotNull(report.getCurrent());
+        assertEquals(report.getCurrent().getWeatherDesc(), "Невелика хмарність");
+
+        assertTrue(report.getHourlyForecasts().size() > 0);
+
+        HourlyForecast hourly = report.getHourlyForecasts().get(0);
+
+        assertEquals(hourly.getWeatherDesc(), "Місцями дощ");
     }
 
     @Test

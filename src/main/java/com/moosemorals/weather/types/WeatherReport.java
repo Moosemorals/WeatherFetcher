@@ -39,14 +39,16 @@ public class WeatherReport {
     private final List<DailyForecast> forecastDays;
     private final List<HourlyForecast> forecastHours;
     private final DateTime when;
+    private final String language;
     private final ErrorReport error;
 
-    public WeatherReport(Location location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, ErrorReport error) {
+    public WeatherReport(Location location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, String language, ErrorReport error) {
         this.location = location;
         this.current = current;
         this.forecastDays = forecastDays;
         this.forecastHours = forecastHours;
         this.when = when;
+        this.language = language;
         this.error = error;
     }
 
@@ -74,8 +76,12 @@ public class WeatherReport {
         return forecastHours;
     }
 
-    public DateTime getLocalTime() {
+    public DateTime getDate() {
         return when;
+    }
+
+    public String getLanguage() {
+        return language;
     }
 
     /**
@@ -88,6 +94,7 @@ public class WeatherReport {
         private final List<DailyForecast> forecastDays;
         private final List<HourlyForecast> forecastHours;
         private DateTime when;
+        private String language = "en";
         private ErrorReport error;
 
         public Builder() {
@@ -120,6 +127,11 @@ public class WeatherReport {
             return this;
         }
 
+        public Builder setLanguage(String language) {
+            this.language = language;
+            return this;
+        }
+
         public Builder setError(ErrorReport error) {
             this.error = error;
             return this;
@@ -127,9 +139,9 @@ public class WeatherReport {
 
         public WeatherReport build() {
             if (error == null) {
-                return new WeatherReport(location, current, forecastDays, forecastHours, when, null);
+                return new WeatherReport(location, current, forecastDays, forecastHours, when, language, null);
             } else {
-                return new WeatherReport(null, null, null, null, null, error);
+                return new WeatherReport(null, null, null, null, null, null, error);
             }
         }
     }

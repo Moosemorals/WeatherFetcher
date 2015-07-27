@@ -50,6 +50,8 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
     private final Logger log = LoggerFactory.getLogger(WeatherParser.class);
 
+    private static final String LANG_TAG = "lang_";
+
     @Override
     public WeatherReport parse(XMLStreamReader parser) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "data");
@@ -74,7 +76,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     builder.setWhen(when);
                     break;
                 case "current_condition":
-                    builder.setCurrent(readCurrent(parser));
+                    builder.setCurrent(readCurrent(parser, builder));
                     break;
                 case "weather":
                     builder.addDailyForecast(readForecast(parser, builder, when));
@@ -97,7 +99,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
         return new ErrorReport("APIError", readTag(parser, "msg"));
     }
 
-    private Current readCurrent(XMLStreamReader parser) throws XMLStreamException, IOException {
+    private Current readCurrent(XMLStreamReader parser, WeatherReport.Builder reportBuilder) throws XMLStreamException, IOException {
 
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "current_condition");
 
@@ -162,6 +164,14 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     builder.setFeelsLikeF(readIntTag(parser, "FeelsLikeF"));
                     break;
                 default:
+                    // Cope with the crazy way that languages are handled.
+                    if (parser.getLocalName().startsWith(LANG_TAG)) {
+                        builder.setWeatherDesc(readTag(parser, parser.getLocalName()).trim());
+
+                        reportBuilder.setLanguage(parser.getLocalName().substring(LANG_TAG.length()));
+
+                        break;
+                    }
                     log.warn("Current: Skiping unexpected tag {}", parser.getLocalName());
                     skipTag(parser);
                     break;
@@ -405,6 +415,11 @@ public class WeatherParser extends BaseParser<WeatherReport> {
                     builder.setChanceOfThunder(readIntTag(parser, "chanceofthunder"));
                     break;
                 default:
+                    // Cope with the crazy way that languages are handled.
+                    if (parser.getLocalName().startsWith(LANG_TAG)) {
+                        builder.setWeatherDesc(readTag(parser, parser.getLocalName()).trim());
+                        break;
+                    }
                     log.warn("Hour: Skiping unexpected tag {}", parser.getLocalName());
                     skipTag(parser);
                     break;

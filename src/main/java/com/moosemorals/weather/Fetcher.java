@@ -70,6 +70,7 @@ public class Fetcher {
 
     private final String apiKey;
     private final String location;
+    private final String language;
     private final CloseableHttpClient httpClient;
     private final int num_of_days;
     private final DateTime date;
@@ -77,9 +78,10 @@ public class Fetcher {
     private final boolean current;
     private final int timePeriod;
 
-    private Fetcher(String apiKey, String location, CloseableHttpClient httpClient, int num_of_days, DateTime date, boolean forecast, boolean current, int timePeriod) {
+    private Fetcher(String apiKey, String location, String language, CloseableHttpClient httpClient, int num_of_days, DateTime date, boolean forecast, boolean current, int timePeriod) {
         this.apiKey = apiKey;
         this.location = location;
+        this.language = language;
         this.httpClient = httpClient;
         this.num_of_days = num_of_days;
         this.date = date;
@@ -117,6 +119,9 @@ public class Fetcher {
         param.put("showlocaltime", "yes");
         if (date != null) {
             param.put("date", DateTimeFormat.forPattern("yyyy-MM-dd").print(date));
+        }
+        if (language != null) {
+            param.put("lang", language);
         }
         if (!forecast) {
             param.put("fx", "no");
@@ -194,6 +199,7 @@ public class Fetcher {
 
         private String apiKey;
         private String location;
+        private String language;
         private CloseableHttpClient httpClient = HttpClients.createDefault();
         private int num_of_days = 3;
         private DateTime date = null;
@@ -237,6 +243,20 @@ public class Fetcher {
          */
         public Builder setLocation(String location) {
             this.location = location;
+            return this;
+        }
+
+        /**
+         * Language for human readable text. Optional, default en. </p>
+         *
+         * <a href="http://www.worldweatheronline.com/api/docs/multilingual.aspx">List
+         * of availible languages</a>.
+         *
+         * @param language String ISO language code
+         * @return this Builder for chaining.
+         */
+        public Builder setLanguage(String language) {
+            this.language = language;
             return this;
         }
 
@@ -325,7 +345,7 @@ public class Fetcher {
         }
 
         public Fetcher build() {
-            return new Fetcher(apiKey, location, httpClient, num_of_days, date, forecast, current, timePeriod);
+            return new Fetcher(apiKey, location, language, httpClient, num_of_days, date, forecast, current, timePeriod);
         }
     }
 

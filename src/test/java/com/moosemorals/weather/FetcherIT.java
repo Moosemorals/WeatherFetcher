@@ -169,7 +169,29 @@ public class FetcherIT {
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
         assertEquals(report.getDailyForecasts().size(), 3, "Should have 3 daily forecasts");
         assertEquals(report.getHourlyForecasts().size(), 4 * 3, "Should have 4 reports/day for 3 days");
+    }
 
+    @Test
+    public void fetchLanguage() throws Exception {
+        // Fetching for Newcastle Upon Tyne, UK
+        FetchResult result = new Fetcher.Builder()
+                .setApiKey(apiKey)
+                .setForecast(false)
+                .setCurrent(true)
+                .setLocation("NE6")
+                .setLanguage("uk")
+                .build()
+                .fetch();
+
+        requestsPerDay = result.getRequestsPerDay();
+        requestsPerSecond = result.getRequestsPerSecond();
+
+        WeatherReport report = result.getReport();
+        assertNotNull(report, "Report should not be null");
+        assertNotNull(report.getCurrent(), "Current should not be null");
+        assertEquals(report.getLanguage(), "uk", "Language should be uk (Ukranian)");
+        assertTrue(report.getDailyForecasts().isEmpty(), "Should have no daily forecast");
+        assertTrue(report.getHourlyForecasts().isEmpty(), "Should have no hourly forecast");
     }
 
     private static String loadAPIKey(InputStream in) throws Exception {
