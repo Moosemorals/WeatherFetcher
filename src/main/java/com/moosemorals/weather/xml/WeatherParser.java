@@ -23,13 +23,14 @@
  */
 package com.moosemorals.weather.xml;
 
+import com.moosemorals.weather.reports.ErrorReport;
+import com.moosemorals.weather.reports.Report;
+import com.moosemorals.weather.reports.WeatherReport;
 import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.DailyForecast;
-import com.moosemorals.weather.types.ErrorReport;
 import com.moosemorals.weather.types.HourlyForecast;
 import com.moosemorals.weather.types.Location;
-import com.moosemorals.weather.types.WeatherReport;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -46,14 +47,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Osric Wilkinson osric@fluffypeople.com
  */
-public class WeatherParser extends BaseParser<WeatherReport> {
+public class WeatherParser extends BaseParser<Report> {
 
     private final Logger log = LoggerFactory.getLogger(WeatherParser.class);
 
     private static final String LANG_TAG = "lang_";
 
     @Override
-    public WeatherReport parse(XMLStreamReader parser) throws XMLStreamException, IOException {
+    public Report parse(XMLStreamReader parser) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "data");
 
         WeatherReport.Builder builder = new WeatherReport.Builder();
@@ -66,8 +67,7 @@ public class WeatherParser extends BaseParser<WeatherReport> {
 
             switch (parser.getLocalName()) {
                 case "error":
-                    builder.setError(readError(parser));
-                    break;
+                    return readError(parser);
                 case "request":
                     builder.setLocation(readLocation(parser));
                     break;

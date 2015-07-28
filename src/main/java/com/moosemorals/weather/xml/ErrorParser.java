@@ -23,7 +23,7 @@
  */
 package com.moosemorals.weather.xml;
 
-import com.moosemorals.weather.types.ErrorReport;
+import com.moosemorals.weather.reports.ErrorReport;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;

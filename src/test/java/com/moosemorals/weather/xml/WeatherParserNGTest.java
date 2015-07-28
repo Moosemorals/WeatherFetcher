@@ -23,12 +23,14 @@
  */
 package com.moosemorals.weather.xml;
 
+import com.moosemorals.weather.reports.ErrorReport;
+import com.moosemorals.weather.reports.Report;
+import com.moosemorals.weather.reports.WeatherReport;
 import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.DailyForecast;
 import com.moosemorals.weather.types.HourlyForecast;
 import com.moosemorals.weather.types.Location;
-import com.moosemorals.weather.types.WeatherReport;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -58,7 +60,10 @@ public class WeatherParserNGTest {
 
     @Test
     public void basics() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
 
         assertNotNull(report);
         assertNotNull(report.getCurrent());
@@ -72,7 +77,10 @@ public class WeatherParserNGTest {
 
     @Test
     public void language() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-lang-uk.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-lang-uk.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
 
         assertEquals(report.getLanguage(), "uk");
         assertNotNull(report.getCurrent());
@@ -87,7 +95,10 @@ public class WeatherParserNGTest {
 
     @Test
     public void location() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
 
         Location location = report.getLocation();
         assertNotNull(location);
@@ -97,7 +108,11 @@ public class WeatherParserNGTest {
 
     @Test
     public void current() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
+
         Current current = report.getCurrent();
 
         assertEquals(current.getObservationTime(), new LocalTime(10, 01));
@@ -124,7 +139,10 @@ public class WeatherParserNGTest {
 
     @Test
     public void forecasts() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
 
         DailyForecast forecast = report.getDailyForecasts().get(0);
 
@@ -139,7 +157,10 @@ public class WeatherParserNGTest {
 
     @Test
     public void astronomy() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
 
         DailyForecast forecast = report.getDailyForecasts().get(0);
 
@@ -154,7 +175,10 @@ public class WeatherParserNGTest {
 
     @Test
     public void hourly() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
 
         List<HourlyForecast> forecasts = report.getHourlyForecasts();
 
@@ -192,7 +216,10 @@ public class WeatherParserNGTest {
 
     @Test
     public void parse_sample_from_fetcher() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/sample-from-fetcher.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-from-fetcher.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
 
         assertEquals(report.getDailyForecasts().size(), 3);
         assertEquals(report.getHourlyForecasts().size(), 8 * 3);
@@ -200,12 +227,13 @@ public class WeatherParserNGTest {
 
     @Test
     public void parse_error() throws Exception {
-        WeatherReport report = new WeatherParser().parse(getClass().getResourceAsStream("/error-bad-location.xml"));
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/error-bad-location.xml"));
 
-        assertEquals(report.isSuccess(), false, "Report is not a success");
-        assertNotNull(report.getError(), "ErrorReport should not be null");
-        assertEquals(report.getError().getMessage(), "Unable to find any matching weather location to the query submitted!", "Unexpected error message");
+        assertTrue(raw instanceof ErrorReport);
+        ErrorReport report = (ErrorReport) raw;
 
+        assertEquals(report.getType(), "APIError");
+        assertEquals(report.getMessage(), "Unable to find any matching weather location to the query submitted!", "Unexpected error message");
     }
 
     @Test

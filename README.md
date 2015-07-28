@@ -19,6 +19,7 @@ The free API is limited to 250 requests/day, 5 requests/second. This library
 does nothing to enforce those limits, but does report your usage.
 
 # Example
+
     final String API_KEY = "...";
     final String LOCATION = "..."; // Name of a city, a postcode, a zipcode, an IPv4 address, or a latitude,longitude pair
 
@@ -28,8 +29,17 @@ does nothing to enforce those limits, but does report your usage.
         .build()
         .fetch();
 
-    WeatherReport report = result.getReport();
-    System.out.println("The temprature in " + LOCATION + " is " + report.getCurrent().getTempC() + "\u00B0C";
+    if (result.isSuccess()) {
+        WeatherReport report = result.getWeather();
+        System.out.println("The temprature in " + LOCATION + " is " + report.getCurrent().getTempC() + "\u00B0C";
+    } else {
+        ErrorReport report = result.getError();
+        System.out.println("Sorry there was a problem: " + report.getMessage());
+    }
+
+# Javadoc
+
+[Javadoc](http://moosemorals.github.io/WeatherFetcher/apidocs/index.html) for the library.
 
 # Licence
 

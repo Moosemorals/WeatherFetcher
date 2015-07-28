@@ -23,8 +23,10 @@
  */
 package com.moosemorals.weather;
 
-import com.moosemorals.weather.types.ErrorReport;
-import com.moosemorals.weather.types.FetchResult;
+import com.moosemorals.weather.reports.ErrorReport;
+import com.moosemorals.weather.reports.FetchResult;
+import com.moosemorals.weather.reports.Report;
+import com.moosemorals.weather.reports.WeatherReport;
 import com.moosemorals.weather.xml.ErrorParser;
 import com.moosemorals.weather.xml.WeatherParser;
 import java.io.BufferedReader;
@@ -93,11 +95,11 @@ public class Fetcher {
     /**
      * Fetch weather report using parameters set in the builder. </p>
      *
-     * Throws IOException for problems. Potential problems include network
-     * issues (can't connect to the API) or API issues (Missing/invalid API key)
+     * Returns a {@link FetchResult} that either contains a
+     * {@link WeatherReport} or an {@link ErrorReport}.
      *
-     * @return WeatherReport containing current data
-     * @throws IOException if there are network problems, or the api request is
+     * @return FetchResult containing weather data, or an error
+     * @throws IOException if there are network problems
      */
     public FetchResult fetch() throws IOException {
         // Check for required parameters
@@ -140,29 +142,40 @@ public class Fetcher {
 
         HttpGet request = new HttpGet(target);
 
+        FetchResult.Builder resultBuilder = new FetchResult.Builder();
+
         log.debug("Fetching URL {}", loggableTarget);
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             StatusLine status = response.getStatusLine();
             log.debug("Response {}", status);
             HttpEntity body = response.getEntity();
 
-            int requestsPerSecond = getIntFromHeader(response, "x-apiaxleproxy-qps-left");
-            int requestsPerDay = getIntFromHeader(response, "x-apiaxleproxy-qpd-left");
+            resultBuilder.setRequestsPerSecond(getIntFromHeader(response, "x-apiaxleproxy-qps-left"));
+            resultBuilder.setRequestsPerDay(getIntFromHeader(response, "x-apiaxleproxy-qpd-left"));
 
             try {
                 if (status.getStatusCode() == 200) {
-                    return new FetchResult(new WeatherParser().parse(dumpInputStream(body.getContent())), requestsPerSecond, requestsPerDay);
+
+                    Report report = new WeatherParser().parse(dumpInputStream(body.getContent()));
+                    if (report instanceof WeatherReport) {
+                        resultBuilder.setWeather((WeatherReport) report);
+                    } else {
+                        resultBuilder.setError((ErrorReport) report);
+                    }
+
                 } else {
                     ErrorReport error = new ErrorParser().parse(body.getContent());
-                    throw new IOException("Could not fetch result from [" + loggableTarget + "]: " + error.getType() + ": " + error.getMessage());
+                    resultBuilder.setError(error);
                 }
             } finally {
                 EntityUtils.consume(body);
             }
 
         } catch (XMLStreamException ex) {
-            throw new IOException("Could not parse result from [" + loggableTarget + "]: " + ex.getMessage(), ex);
+            resultBuilder.setError(new ErrorReport(ex));
         }
+
+        return resultBuilder.build();
     }
 
     private static int getIntFromHeader(CloseableHttpResponse response, String headerName) {

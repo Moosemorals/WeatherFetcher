@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.moosemorals.weather.types;
+package com.moosemorals.weather.reports;
 
 /**
  * Result of fetching weather data.
@@ -31,29 +31,42 @@ package com.moosemorals.weather.types;
 public class FetchResult {
 
     private final WeatherReport report;
+    private final ErrorReport error;
     private final int requestsPerSecond;
     private final int requestsPerDay;
 
-    /**
-     * Construct new FetchResult. Not really useful to end users.
-     *
-     * @param report
-     * @param requestsPerSecond
-     * @param requestsPerDay
-     */
-    public FetchResult(WeatherReport report, int requestsPerSecond, int requestsPerDay) {
+    private FetchResult(WeatherReport report, ErrorReport error, int requestsPerSecond, int requestsPerDay) {
         this.report = report;
+        this.error = error;
         this.requestsPerSecond = requestsPerSecond;
         this.requestsPerDay = requestsPerDay;
     }
 
     /**
-     * Weather report.
+     * Weather report. Will be null if there was an error.
      *
      * @return
      */
-    public WeatherReport getReport() {
+    public WeatherReport getWeather() {
         return report;
+    }
+
+    /**
+     * Error report. Will be null if there was not an error.
+     *
+     * @return
+     */
+    public ErrorReport getError() {
+        return error;
+    }
+
+    /**
+     * Returns true if the fetch succeeded.
+     *
+     * @return
+     */
+    public boolean isSuccess() {
+        return error == null;
     }
 
     /**
@@ -76,6 +89,42 @@ public class FetchResult {
      */
     public int getRequestsPerDay() {
         return requestsPerDay;
+    }
+
+    public static class Builder {
+
+        private WeatherReport report;
+        private ErrorReport error;
+        private int requestsPerSecond;
+        private int requestsPerDay;
+
+        public Builder() {
+            super();
+        }
+
+        public Builder setWeather(WeatherReport report) {
+            this.report = report;
+            return this;
+        }
+
+        public Builder setError(ErrorReport error) {
+            this.error = error;
+            return this;
+        }
+
+        public Builder setRequestsPerSecond(int requestsPerSecond) {
+            this.requestsPerSecond = requestsPerSecond;
+            return this;
+        }
+
+        public Builder setRequestsPerDay(int requestsPerDay) {
+            this.requestsPerDay = requestsPerDay;
+            return this;
+        }
+
+        public FetchResult build() {
+            return new FetchResult(report, error, requestsPerSecond, requestsPerDay);
+        }
     }
 
 }

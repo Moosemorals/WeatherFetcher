@@ -21,8 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.moosemorals.weather.types;
+package com.moosemorals.weather.reports;
 
+import com.moosemorals.weather.types.Current;
+import com.moosemorals.weather.types.DailyForecast;
+import com.moosemorals.weather.types.HourlyForecast;
+import com.moosemorals.weather.types.Location;
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTime;
@@ -32,7 +36,7 @@ import org.joda.time.DateTime;
  *
  * @author Osric Wilkinson osric@fluffypeople.com
  */
-public class WeatherReport {
+public class WeatherReport implements Report {
 
     private final Location location;
     private final Current current;
@@ -40,24 +44,14 @@ public class WeatherReport {
     private final List<HourlyForecast> forecastHours;
     private final DateTime when;
     private final String language;
-    private final ErrorReport error;
 
-    public WeatherReport(Location location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, String language, ErrorReport error) {
+    private WeatherReport(Location location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, String language) {
         this.location = location;
         this.current = current;
         this.forecastDays = forecastDays;
         this.forecastHours = forecastHours;
         this.when = when;
         this.language = language;
-        this.error = error;
-    }
-
-    public boolean isSuccess() {
-        return error == null;
-    }
-
-    public ErrorReport getError() {
-        return error;
     }
 
     public Location getLocation() {
@@ -95,7 +89,6 @@ public class WeatherReport {
         private final List<HourlyForecast> forecastHours;
         private DateTime when;
         private String language = "en";
-        private ErrorReport error;
 
         public Builder() {
             forecastDays = new ArrayList<>();
@@ -132,17 +125,10 @@ public class WeatherReport {
             return this;
         }
 
-        public Builder setError(ErrorReport error) {
-            this.error = error;
-            return this;
-        }
-
         public WeatherReport build() {
-            if (error == null) {
-                return new WeatherReport(location, current, forecastDays, forecastHours, when, language, null);
-            } else {
-                return new WeatherReport(null, null, null, null, null, null, error);
-            }
+
+            return new WeatherReport(location, current, forecastDays, forecastHours, when, language);
+
         }
     }
 

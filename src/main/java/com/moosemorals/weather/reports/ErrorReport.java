@@ -21,22 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.moosemorals.weather.types;
+package com.moosemorals.weather.reports;
 
 /**
  * Error report from the API.
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
-public class ErrorReport {
+public class ErrorReport implements Report {
 
     private final String type;
     private final String message;
+    private final Exception cause;
 
     public ErrorReport(String type, String message) {
-
         this.type = type;
         this.message = message;
+        this.cause = null;
+    }
+
+    public ErrorReport(Exception ex) {
+        this.type = ex.getClass().getName();
+        this.message = ex.getMessage();
+        this.cause = ex;
     }
 
     /**
@@ -55,6 +62,13 @@ public class ErrorReport {
      */
     public String getMessage() {
         return message;
+    }
+
+    /**
+     * Cause (if from exception). May be null
+     */
+    public Exception getCause() {
+        return cause;
     }
 
 }

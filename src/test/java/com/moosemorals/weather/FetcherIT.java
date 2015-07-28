@@ -23,8 +23,9 @@
  */
 package com.moosemorals.weather;
 
-import com.moosemorals.weather.types.FetchResult;
-import com.moosemorals.weather.types.WeatherReport;
+import com.moosemorals.weather.reports.ErrorReport;
+import com.moosemorals.weather.reports.FetchResult;
+import com.moosemorals.weather.reports.WeatherReport;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,6 +34,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.AfterClass;
@@ -97,7 +99,10 @@ public class FetcherIT {
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
 
-        WeatherReport report = result.getReport();
+        assertTrue(result.isSuccess());
+        assertEquals(result.getError(), null);
+
+        WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
         assertEquals(report.getDailyForecasts().size(), 3, "Should have 3 daily forecasts");
@@ -123,7 +128,10 @@ public class FetcherIT {
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
 
-        WeatherReport report = result.getReport();
+        assertTrue(result.isSuccess());
+        assertEquals(result.getError(), null);
+
+        WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
         assertEquals(report.getCurrent(), null, "Current should be null");
         assertTrue(report.getDailyForecasts().isEmpty(), "Should have no daily forecast");
@@ -143,7 +151,10 @@ public class FetcherIT {
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
 
-        WeatherReport report = result.getReport();
+        assertTrue(result.isSuccess());
+        assertEquals(result.getError(), null);
+
+        WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
         assertEquals(report.getDailyForecasts().size(), 1, "Should have 1 daily forecasts");
@@ -164,7 +175,10 @@ public class FetcherIT {
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
 
-        WeatherReport report = result.getReport();
+        assertTrue(result.isSuccess());
+        assertEquals(result.getError(), null);
+
+        WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
         assertEquals(report.getDailyForecasts().size(), 3, "Should have 3 daily forecasts");
@@ -186,12 +200,37 @@ public class FetcherIT {
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
 
-        WeatherReport report = result.getReport();
+        assertTrue(result.isSuccess());
+        assertEquals(result.getError(), null);
+
+        WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current should not be null");
         assertEquals(report.getLanguage(), "uk", "Language should be uk (Ukranian)");
         assertTrue(report.getDailyForecasts().isEmpty(), "Should have no daily forecast");
         assertTrue(report.getHourlyForecasts().isEmpty(), "Should have no hourly forecast");
+    }
+
+    @Test
+    public void fetchError() throws Exception {
+        String bogusKey = "XXXX-testing-XXXX";
+
+        FetchResult result = new Fetcher.Builder()
+                .setApiKey(bogusKey)
+                .setLocation("NE6")
+                .build()
+                .fetch();
+
+        assertFalse(result.isSuccess());
+
+        ErrorReport report = result.getError();
+
+        assertNotNull(report);
+        assertNotNull(report.getType());
+        assertEquals(report.getType(), "KeyError");
+
+        assertNotNull(report.getMessage());
+        assertEquals(report.getMessage(), "'" + bogusKey + "' is not a valid key.");
     }
 
     private static String loadAPIKey(InputStream in) throws Exception {

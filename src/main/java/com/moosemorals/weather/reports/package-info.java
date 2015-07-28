@@ -21,24 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.moosemorals.weather.xml;
-
-import com.moosemorals.weather.reports.ErrorReport;
-import static org.testng.Assert.assertEquals;
-import org.testng.annotations.Test;
-
 /**
- *
- * @author Osric Wilkinson <osric@fluffypeople.com>
+ * Results of fetches of various types.
  */
-public class ErrorParserNGTest {
-
-    @Test
-    public void basic_parse() throws Exception {
-
-        ErrorReport result = new ErrorParser().parse(getClass().getResourceAsStream("/error-no-key.xml"));
-
-        assertEquals(result.getType(), "KeyError");
-        assertEquals(result.getMessage(), "No api_key specified.");
-    }
-}
+package com.moosemorals.weather.reports;

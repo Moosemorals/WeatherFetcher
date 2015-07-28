@@ -11,16 +11,23 @@
         <h2>Usage</h2>
         <ol><li>Register, and get an API key from <a href="https://developer.worldweatheronline.com/auth/register">the registration page</a>.</li>
             <li><p>Run code something like:</p>
-                <pre>final String API_KEY = "...";
-final String LOCATION = "..."; // Name of a city, a postcode, a zipcode, an IPv4 address, or a lattitude,longitude pair
-FetchResult result = new Fetcher.Builder()
-	.setApiKey(API_KEY)
-.       .setLocation(LOCATION)
-	.build()
-	.fetch();
+                <pre>
+    final String API_KEY = "...";
+    final String LOCATION = "..."; // Name of a city, a postcode, a zipcode, an IPv4 address, or a latitude,longitude pair
 
-	WeatherReport report = result.getReport();
-	System.out.println("The temprature in " + LOCATION + " is " + report.getTempC() + "\u00B0C";
+    FetchResult result = new Fetcher.Builder()
+        .setApiKey(API_KEY)
+        .setLocation(LOCATION) 
+        .build()
+        .fetch();
+
+    if (result.isSuccess()) {
+        WeatherReport report = result.getWeather();
+        System.out.println("The temprature in " + LOCATION + " is " + report.getCurrent().getTempC() + "\u00B0C";
+    } else {
+        ErrorReport report = result.getError();
+        System.out.println("Sorry there was a problem: " + report.getMessage());
+    }
 </pre>
             </li>
         </ol>
