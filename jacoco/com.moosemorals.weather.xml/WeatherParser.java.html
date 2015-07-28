@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>WeatherParser.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Weather Fetcher</a> &gt; <a href="index.source.html" class="el_package">com.moosemorals.weather.xml</a> &gt; <span class="el_source">WeatherParser.java</span></div><h1>WeatherParser.java</h1><pre class="source lang-java linenums">/*
+ * The MIT License
+ *
+ * Copyright 2015 osric.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the &quot;Software&quot;), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package com.moosemorals.weather.xml;
+
+import com.moosemorals.weather.reports.ErrorReport;
+import com.moosemorals.weather.reports.Report;
+import com.moosemorals.weather.reports.WeatherReport;
+import com.moosemorals.weather.types.Astronomy;
+import com.moosemorals.weather.types.Current;
+import com.moosemorals.weather.types.DailyForecast;
+import com.moosemorals.weather.types.HourlyForecast;
+import com.moosemorals.weather.types.Location;
+import java.io.IOException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Parse XML weather data from the World Weather Online v2 API.
+ *
+ * @author Osric Wilkinson osric@fluffypeople.com
+ */
+<span class="fc" id="L50">public class WeatherParser extends BaseParser&lt;Report&gt; {</span>
+
+<span class="fc" id="L52">    private final Logger log = LoggerFactory.getLogger(WeatherParser.class);</span>
+
+    private static final String LANG_TAG = &quot;lang_&quot;;
+
+    @Override
+    public Report parse(XMLStreamReader parser) throws XMLStreamException, IOException {
+<span class="fc" id="L58">        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, &quot;data&quot;);</span>
+
+<span class="fc" id="L60">        WeatherReport.Builder builder = new WeatherReport.Builder();</span>
+<span class="fc" id="L61">        DateTime when = null;</span>
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        while (parser.next() != XMLStreamReader.END_ELEMENT) {</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {</span>
+<span class="fc" id="L65">                continue;</span>
+            }
+
+<span class="pc bpc" id="L68" title="7 of 22 branches missed.">            switch (parser.getLocalName()) {</span>
+                case &quot;error&quot;:
+<span class="fc" id="L70">                    return readError(parser);</span>
+                case &quot;request&quot;:
+<span class="fc" id="L72">                    builder.setLocation(readLocation(parser));</span>
+<span class="fc" id="L73">                    break;</span>
+                case &quot;time_zone&quot;:
+<span class="fc" id="L75">                    when = readTimeZone(parser);</span>
+<span class="fc" id="L76">                    builder.setWhen(when);</span>
+<span class="fc" id="L77">                    break;</span>
+                case &quot;current_condition&quot;:
+<span class="fc" id="L79">                    builder.setCurrent(readCurrent(parser, builder));</span>
+<span class="fc" id="L80">                    break;</span>
+                case &quot;weather&quot;:
+<span class="fc" id="L82">                    builder.addDailyForecast(readForecast(parser, builder, when));</span>
+<span class="fc" id="L83">                    break;</span>
+                default:
+<span class="nc" id="L85">                    log.warn(&quot;Top: Skiping unexpected tag {}&quot;, parser.getLocalName());</span>
+<span class="nc" id="L86">                    skipTag(parser);</span>
+<span class="fc" id="L87">                    break;</span>
+            }
+        }
+<span class="fc" id="L90">        return builder.build();</span>
+    }
+
+    private ErrorReport readError(XMLStreamReader parser) throws XMLStreamException, IOException {
+<span class="fc" id="L94">        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, &quot;error&quot;);</span>
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        while (parser.next() != XMLStreamReader.START_ELEMENT) {</span>
+            // skip noise
+        }
+<span class="fc" id="L99">        return new ErrorReport(&quot;APIError&quot;, readTag(parser, &quot;msg&quot;));</span>
+    }
+
+    private Current readCurrent(XMLStreamReader parser, WeatherReport.Builder reportBuilder) throws XMLStreamException, IOException {
+
+<span class="fc" id="L104">        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, &quot;current_condition&quot;);</span>
+
+<span class="fc" id="L106">        DateTimeFormatter fmt = DateTimeFormat.forPattern(&quot;hh:mm aa&quot;).withZoneUTC();</span>
+<span class="fc" id="L107">        Current.Builder builder = new Current.Builder();</span>
+
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        while (parser.next() != XMLStreamReader.END_ELEMENT) {</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {</span>
+<span class="fc" id="L111">                continue;</span>
+            }
+
+<span class="pc bpc" id="L114" title="17 of 70 branches missed.">            switch (parser.getLocalName()) {</span>
+                case &quot;observation_time&quot;:
+<span class="fc" id="L116">                    builder.setObservationTime(fmt.parseLocalTime(readTag(parser, &quot;observation_time&quot;)));</span>
+<span class="fc" id="L117">                    break;</span>
+                case &quot;temp_C&quot;:
+<span class="fc" id="L119">                    builder.setTempC(readIntTag(parser, &quot;temp_C&quot;));</span>
+<span class="fc" id="L120">                    break;</span>
+                case &quot;temp_F&quot;:
+<span class="fc" id="L122">                    builder.setTempF(readIntTag(parser, &quot;temp_F&quot;));</span>
+<span class="fc" id="L123">                    break;</span>
+                case &quot;weatherCode&quot;:
+<span class="fc" id="L125">                    builder.setWeatherCode(readIntTag(parser, &quot;weatherCode&quot;));</span>
+<span class="fc" id="L126">                    break;</span>
+                case &quot;weatherIconUrl&quot;:
+<span class="fc" id="L128">                    builder.setWeatherIconUrl(readTag(parser, &quot;weatherIconUrl&quot;).trim());</span>
+<span class="fc" id="L129">                    break;</span>
+                case &quot;weatherDesc&quot;:
+<span class="fc" id="L131">                    builder.setWeatherDesc(readTag(parser, &quot;weatherDesc&quot;).trim());</span>
+<span class="fc" id="L132">                    break;</span>
+                case &quot;windspeedMiles&quot;:
+<span class="fc" id="L134">                    builder.setWindspeedMiles(readIntTag(parser, &quot;windspeedMiles&quot;));</span>
+<span class="fc" id="L135">                    break;</span>
+                case &quot;windspeedKmph&quot;:
+<span class="fc" id="L137">                    builder.setWindspeedKmph(readIntTag(parser, &quot;windspeedKmph&quot;));</span>
+<span class="fc" id="L138">                    break;</span>
+                case &quot;winddirDegree&quot;:
+<span class="fc" id="L140">                    builder.setWinddirDegree(readIntTag(parser, &quot;winddirDegree&quot;));</span>
+<span class="fc" id="L141">                    break;</span>
+                case &quot;winddir16Point&quot;:
+<span class="fc" id="L143">                    builder.setWinddir16Point(readTag(parser, &quot;winddir16Point&quot;));</span>
+<span class="fc" id="L144">                    break;</span>
+                case &quot;precipMM&quot;:
+<span class="fc" id="L146">                    builder.setPrecipMM(readFloatTag(parser, &quot;precipMM&quot;));</span>
+<span class="fc" id="L147">                    break;</span>
+                case &quot;humidity&quot;:
+<span class="fc" id="L149">                    builder.setHumidity(readIntTag(parser, &quot;humidity&quot;));</span>
+<span class="fc" id="L150">                    break;</span>
+                case &quot;visibility&quot;:
+<span class="fc" id="L152">                    builder.setVisibility(readIntTag(parser, &quot;visibility&quot;));</span>
+<span class="fc" id="L153">                    break;</span>
+                case &quot;pressure&quot;:
+<span class="fc" id="L155">                    builder.setPressure(readIntTag(parser, &quot;pressure&quot;));</span>
+<span class="fc" id="L156">                    break;</span>
+                case &quot;cloudcover&quot;:
+<span class="fc" id="L158">                    builder.setCloudcover(readIntTag(parser, &quot;cloudcover&quot;));</span>
+<span class="fc" id="L159">                    break;</span>
+                case &quot;FeelsLikeC&quot;:
+<span class="fc" id="L161">                    builder.setFeelsLikeC(readIntTag(parser, &quot;FeelsLikeC&quot;));</span>
+<span class="fc" id="L162">                    break;</span>
+                case &quot;FeelsLikeF&quot;:
+<span class="fc" id="L164">                    builder.setFeelsLikeF(readIntTag(parser, &quot;FeelsLikeF&quot;));</span>
+<span class="fc" id="L165">                    break;</span>
+                default:
+                    // Cope with the crazy way that languages are handled.
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">                    if (parser.getLocalName().startsWith(LANG_TAG)) {</span>
+<span class="fc" id="L169">                        builder.setWeatherDesc(readTag(parser, parser.getLocalName()).trim());</span>
+
+<span class="fc" id="L171">                        reportBuilder.setLanguage(parser.getLocalName().substring(LANG_TAG.length()));</span>
+
+<span class="fc" id="L173">                        break;</span>
+                    }
+<span class="nc" id="L175">                    log.warn(&quot;Current: Skiping unexpected tag {}&quot;, parser.getLocalName());</span>
+<span class="nc" id="L176">                    skipTag(parser);</span>
+<span class="fc" id="L177">                    break;</span>
+            }
+        }
+<span class="fc" id="L180">        return builder.build();</span>
+
+    }
+
+    private DailyForecast readForecast(XMLStreamReader parser, WeatherReport.Builder reportBuilder, DateTime when) throws XMLStreamException, IOException {
+<span class="fc" id="L185">        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, &quot;weather&quot;);</span>
+
+<span class="fc" id="L187">        DailyForecast.Builder builder = new DailyForecast.Builder();</span>
+
+<span class="fc" id="L189">        DateTimeFormatter fmt = DateTimeFormat.forPattern(&quot;yyyy-MM-dd&quot;).withZone(when.getZone());</span>
+
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        while (parser.next() != XMLStreamReader.END_ELEMENT) {</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {</span>
+<span class="fc" id="L193">                continue;</span>
+            }
+
+<span class="pc bpc" id="L196" title="10 of 34 branches missed.">            switch (parser.getLocalName()) {</span>
+                case &quot;date&quot;:
+<span class="fc" id="L198">                    builder.setDate(fmt.parseDateTime(readTag(parser, &quot;date&quot;)));</span>
+<span class="fc" id="L199">                    break;</span>
+                case &quot;astronomy&quot;:
+<span class="fc" id="L201">                    builder.setAstronomy(readAstronmy(parser, when));</span>
+<span class="fc" id="L202">                    break;</span>
+                case &quot;maxtempC&quot;:
+<span class="fc" id="L204">                    builder.setMaxTempC(readIntTag(parser, &quot;maxtempC&quot;));</span>
+<span class="fc" id="L205">                    break;</span>
+                case &quot;maxtempF&quot;:
+<span class="fc" id="L207">                    builder.setMaxTempF(readIntTag(parser, &quot;maxtempF&quot;));</span>
+<span class="fc" id="L208">                    break;</span>
+                case &quot;mintempC&quot;:
+<span class="fc" id="L210">                    builder.setMinTempC(readIntTag(parser, &quot;mintempC&quot;));</span>
+<span class="fc" id="L211">                    break;</span>
+                case &quot;mintempF&quot;:
+<span class="fc" id="L213">                    builder.setMinTempF(readIntTag(parser, &quot;mintempF&quot;));</span>
+<span class="fc" id="L214">                    break;</span>
+                case &quot;uvIndex&quot;:
+<span class="fc" id="L216">                    builder.setUvIndex(readIntTag(parser, &quot;uvIndex&quot;));</span>
+<span class="fc" id="L217">                    break;</span>
+                case &quot;hourly&quot;:
+<span class="fc" id="L219">                    reportBuilder.addHourlyForecast(readHour(parser));</span>
+<span class="fc" id="L220">                    break;</span>
+                default:
+<span class="nc" id="L222">                    log.warn(&quot;Forecast: Skiping unexpected tag {}&quot;, parser.getLocalName());</span>
+<span class="nc" id="L223">                    skipTag(parser);</span>
+<span class="fc" id="L224">                    break;</span>
+            }
+        }
+
+<span class="fc" id="L228">        return builder.build();</span>
+    }
+
+    private Astronomy readAstronmy(XMLStreamReader parser, DateTime when) throws XMLStreamException, IOException {
+<span class="fc" id="L232">        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, &quot;astronomy&quot;);</span>
+
+<span class="fc" id="L234">        Astronomy.Builder builder = new Astronomy.Builder();</span>
+
+<span class="fc" id="L236">        DateTimeFormatter fmt = DateTimeFormat.forPattern(&quot;hh:mm aa&quot;);</span>
+
+<span class="fc bfc" id="L238" title="All 2 branches covered.">        while (parser.next() != XMLStreamReader.END_ELEMENT) {</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {</span>
+<span class="fc" id="L240">                continue;</span>
+            }
+
+            String raw;
+            LocalTime time;
+<span class="pc bpc" id="L245" title="6 of 18 branches missed.">            switch (parser.getLocalName()) {</span>
+                case &quot;sunrise&quot;:
+<span class="fc" id="L247">                    raw = readTag(parser, &quot;sunrise&quot;);</span>
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">                    if (!raw.equals(&quot;No sunrise&quot;)) {</span>
+<span class="fc" id="L249">                        time = fmt.parseLocalTime(raw);</span>
+<span class="fc" id="L250">                        builder.setSunrise(when.withHourOfDay(time.getHourOfDay()).withMinuteOfHour(time.getMinuteOfHour()));</span>
+                    } else {
+<span class="nc" id="L252">                        builder.setSunrise(null);</span>
+                    }
+<span class="nc" id="L254">                    break;</span>
+                case &quot;sunset&quot;:
+<span class="fc" id="L256">                    raw = readTag(parser, &quot;sunset&quot;);</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">                    if (!raw.equals(&quot;No sunset&quot;)) {</span>
+<span class="fc" id="L258">                        time = fmt.parseLocalTime(raw);</span>
+<span class="fc" id="L259">                        builder.setSunset(when.withHourOfDay(time.getHourOfDay()).withMinuteOfHour(time.getMinuteOfHour()));</span>
+                    } else {
+<span class="nc" id="L261">                        builder.setSunset(null);</span>
+                    }
+<span class="nc" id="L263">                    break;</span>
+                case &quot;moonrise&quot;:
+<span class="fc" id="L265">                    raw = readTag(parser, &quot;moonrise&quot;);</span>
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">                    if (!raw.equals(&quot;No moonrise&quot;)) {</span>
+<span class="fc" id="L267">                        time = fmt.parseLocalTime(raw);</span>
+<span class="fc" id="L268">                        builder.setMoonrise(when.withHourOfDay(time.getHourOfDay()).withMinuteOfHour(time.getMinuteOfHour()));</span>
+                    } else {
+<span class="nc" id="L270">                        builder.setMoonrise(null);</span>
+                    }
+<span class="nc" id="L272">                    break;</span>
+                case &quot;moonset&quot;:
+<span class="fc" id="L274">                    raw = readTag(parser, &quot;moonset&quot;);</span>
+<span class="pc bpc" id="L275" title="1 of 2 branches missed.">                    if (!raw.equals(&quot;No moonset&quot;)) {</span>
+<span class="fc" id="L276">                        time = fmt.parseLocalTime(raw);</span>
+<span class="fc" id="L277">                        builder.setMoonset(when.withHourOfDay(time.getHourOfDay()).withMinuteOfHour(time.getMinuteOfHour()));</span>
+                    } else {
+<span class="nc" id="L279">                        builder.setMoonset(null);</span>
+                    }
+<span class="nc" id="L281">                    break;</span>
+                default:
+<span class="nc" id="L283">                    log.warn(&quot;Astro: Skiping unexpected tag {}&quot;, parser.getLocalName());</span>
+<span class="nc" id="L284">                    skipTag(parser);</span>
+                    break;
+            }
+<span class="fc" id="L287">        }</span>
+
+<span class="fc" id="L289">        return builder.build();</span>
+    }
+
+    private HourlyForecast readHour(XMLStreamReader parser) throws XMLStreamException, IOException {
+<span class="fc" id="L293">        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, &quot;hourly&quot;);</span>
+
+<span class="fc" id="L295">        HourlyForecast.Builder builder = new HourlyForecast.Builder();</span>
+
+<span class="fc" id="L297">        LocalTime utcTime = null;</span>
+<span class="fc" id="L298">        DateTime utcDate = null;</span>
+
+<span class="fc bfc" id="L300" title="All 2 branches covered.">        while (parser.next() != XMLStreamReader.END_ELEMENT) {</span>
+<span class="fc bfc" id="L301" title="All 2 branches covered.">            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {</span>
+<span class="fc" id="L302">                continue;</span>
+            }
+
+<span class="pc bpc" id="L305" title="37 of 150 branches missed.">            switch (parser.getLocalName()) {</span>
+                case &quot;time&quot;:
+<span class="fc" id="L307">                    skipTag(parser);</span>
+<span class="fc" id="L308">                    break;</span>
+                case &quot;UTCdate&quot;:
+<span class="fc" id="L310">                    utcDate = DateTimeFormat.forPattern(&quot;yyyy-MM-dd&quot;).withZoneUTC().parseDateTime(readTag(parser, &quot;UTCdate&quot;));</span>
+<span class="fc" id="L311">                    break;</span>
+                case &quot;UTCtime&quot;:
+<span class="fc" id="L313">                    utcTime = readTime(readTag(parser, &quot;UTCtime&quot;));</span>
+<span class="fc" id="L314">                    break;</span>
+                case &quot;tempC&quot;:
+<span class="fc" id="L316">                    builder.setTempC(readIntTag(parser, &quot;tempC&quot;));</span>
+<span class="fc" id="L317">                    break;</span>
+                case &quot;tempF&quot;:
+<span class="fc" id="L319">                    builder.setTempF(readIntTag(parser, &quot;tempF&quot;));</span>
+<span class="fc" id="L320">                    break;</span>
+                case &quot;windspeedMiles&quot;:
+<span class="fc" id="L322">                    builder.setWindspeedMiles(readIntTag(parser, &quot;windspeedMiles&quot;));</span>
+<span class="fc" id="L323">                    break;</span>
+                case &quot;windspeedKmph&quot;:
+<span class="fc" id="L325">                    builder.setWindspeedKPH(readIntTag(parser, &quot;windspeedKmph&quot;));</span>
+<span class="fc" id="L326">                    break;</span>
+                case &quot;winddirDegree&quot;:
+<span class="fc" id="L328">                    builder.setWinddirDegree(readIntTag(parser, &quot;winddirDegree&quot;));</span>
+<span class="fc" id="L329">                    break;</span>
+                case &quot;winddir16Point&quot;:
+<span class="fc" id="L331">                    builder.setWinddir16Point(readTag(parser, &quot;winddir16Point&quot;));</span>
+<span class="fc" id="L332">                    break;</span>
+                case &quot;weatherCode&quot;:
+<span class="fc" id="L334">                    builder.setWeatherCode(readIntTag(parser, &quot;weatherCode&quot;));</span>
+<span class="fc" id="L335">                    break;</span>
+                case &quot;weatherIconUrl&quot;:
+<span class="fc" id="L337">                    builder.setWeatherIconUrl(readTag(parser, &quot;weatherIconUrl&quot;).trim());</span>
+<span class="fc" id="L338">                    break;</span>
+                case &quot;weatherDesc&quot;:
+<span class="fc" id="L340">                    builder.setWeatherDesc(readTag(parser, &quot;weatherDesc&quot;).trim());</span>
+<span class="fc" id="L341">                    break;</span>
+                case &quot;precipMM&quot;:
+<span class="fc" id="L343">                    builder.setPrecipMM(readFloatTag(parser, &quot;precipMM&quot;));</span>
+<span class="fc" id="L344">                    break;</span>
+                case &quot;humidity&quot;:
+<span class="fc" id="L346">                    builder.setHumidity(readIntTag(parser, &quot;humidity&quot;));</span>
+<span class="fc" id="L347">                    break;</span>
+                case &quot;visibility&quot;:
+<span class="fc" id="L349">                    builder.setVisibility(readIntTag(parser, &quot;visibility&quot;));</span>
+<span class="fc" id="L350">                    break;</span>
+                case &quot;pressure&quot;:
+<span class="fc" id="L352">                    builder.setPressureMb(readIntTag(parser, &quot;pressure&quot;));</span>
+<span class="fc" id="L353">                    break;</span>
+                case &quot;cloudcover&quot;:
+<span class="fc" id="L355">                    builder.setCloudcover(readIntTag(parser, &quot;cloudcover&quot;));</span>
+<span class="fc" id="L356">                    break;</span>
+                case &quot;HeatIndexC&quot;:
+<span class="fc" id="L358">                    builder.setHeatIndexC(readIntTag(parser, &quot;HeatIndexC&quot;));</span>
+<span class="fc" id="L359">                    break;</span>
+                case &quot;HeatIndexF&quot;:
+<span class="fc" id="L361">                    builder.setHeatIndexF(readIntTag(parser, &quot;HeatIndexF&quot;));</span>
+<span class="fc" id="L362">                    break;</span>
+                case &quot;DewPointC&quot;:
+<span class="fc" id="L364">                    builder.setDewPointC(readIntTag(parser, &quot;DewPointC&quot;));</span>
+<span class="fc" id="L365">                    break;</span>
+                case &quot;DewPointF&quot;:
+<span class="fc" id="L367">                    builder.setDewPointF(readIntTag(parser, &quot;DewPointF&quot;));</span>
+<span class="fc" id="L368">                    break;</span>
+                case &quot;WindChillC&quot;:
+<span class="fc" id="L370">                    builder.setWindChillC(readIntTag(parser, &quot;WindChillC&quot;));</span>
+<span class="fc" id="L371">                    break;</span>
+                case &quot;WindChillF&quot;:
+<span class="fc" id="L373">                    builder.setWindChillF(readIntTag(parser, &quot;WindChillF&quot;));</span>
+<span class="fc" id="L374">                    break;</span>
+                case &quot;WindGustMiles&quot;:
+<span class="fc" id="L376">                    builder.setWindGustMiles(readIntTag(parser, &quot;WindGustMiles&quot;));</span>
+<span class="fc" id="L377">                    break;</span>
+                case &quot;WindGustKmph&quot;:
+<span class="fc" id="L379">                    builder.setWindGustKmph(readIntTag(parser, &quot;WindGustKmph&quot;));</span>
+<span class="fc" id="L380">                    break;</span>
+                case &quot;FeelsLikeC&quot;:
+<span class="fc" id="L382">                    builder.setFeelsLikeC(readIntTag(parser, &quot;FeelsLikeC&quot;));</span>
+<span class="fc" id="L383">                    break;</span>
+                case &quot;FeelsLikeF&quot;:
+<span class="fc" id="L385">                    builder.setFeelsLikeF(readIntTag(parser, &quot;FeelsLikeF&quot;));</span>
+<span class="fc" id="L386">                    break;</span>
+                case &quot;chanceofrain&quot;:
+<span class="fc" id="L388">                    builder.setChanceOfRain(readIntTag(parser, &quot;chanceofrain&quot;));</span>
+<span class="fc" id="L389">                    break;</span>
+                case &quot;chanceofwindy&quot;:
+<span class="fc" id="L391">                    builder.setChanceOfWindy(readIntTag(parser, &quot;chanceofwindy&quot;));</span>
+<span class="fc" id="L392">                    break;</span>
+                case &quot;chanceofovercast&quot;:
+<span class="fc" id="L394">                    builder.setChanceOfOvercast(readIntTag(parser, &quot;chanceofovercast&quot;));</span>
+<span class="fc" id="L395">                    break;</span>
+                case &quot;chanceofremdry&quot;:
+<span class="fc" id="L397">                    builder.setChanceOfRemdry(readIntTag(parser, &quot;chanceofremdry&quot;));</span>
+<span class="fc" id="L398">                    break;</span>
+                case &quot;chanceofhightemp&quot;:
+<span class="fc" id="L400">                    builder.setChanceOfHightemp(readIntTag(parser, &quot;chanceofhightemp&quot;));</span>
+<span class="fc" id="L401">                    break;</span>
+                case &quot;chanceofsnow&quot;:
+<span class="fc" id="L403">                    builder.setChanceofSnow(readIntTag(parser, &quot;chanceofsnow&quot;));</span>
+<span class="fc" id="L404">                    break;</span>
+                case &quot;chanceofsunshine&quot;:
+<span class="fc" id="L406">                    builder.setChanceOfSunny(readIntTag(parser, &quot;chanceofsunshine&quot;));</span>
+<span class="fc" id="L407">                    break;</span>
+                case &quot;chanceoffog&quot;:
+<span class="fc" id="L409">                    builder.setChanceOfFog(readIntTag(parser, &quot;chanceoffog&quot;));</span>
+<span class="fc" id="L410">                    break;</span>
+                case &quot;chanceoffrost&quot;:
+<span class="fc" id="L412">                    builder.setChanceOfFrost(readIntTag(parser, &quot;chanceoffrost&quot;));</span>
+<span class="fc" id="L413">                    break;</span>
+                case &quot;chanceofthunder&quot;:
+<span class="fc" id="L415">                    builder.setChanceOfThunder(readIntTag(parser, &quot;chanceofthunder&quot;));</span>
+<span class="fc" id="L416">                    break;</span>
+                default:
+                    // Cope with the crazy way that languages are handled.
+<span class="pc bpc" id="L419" title="1 of 2 branches missed.">                    if (parser.getLocalName().startsWith(LANG_TAG)) {</span>
+<span class="fc" id="L420">                        builder.setWeatherDesc(readTag(parser, parser.getLocalName()).trim());</span>
+<span class="fc" id="L421">                        break;</span>
+                    }
+<span class="nc" id="L423">                    log.warn(&quot;Hour: Skiping unexpected tag {}&quot;, parser.getLocalName());</span>
+<span class="nc" id="L424">                    skipTag(parser);</span>
+<span class="fc" id="L425">                    break;</span>
+            }
+        }
+
+<span class="pc bpc" id="L429" title="2 of 4 branches missed.">        if (utcDate != null &amp;&amp; utcTime != null) {</span>
+<span class="fc" id="L430">            DateTime time = utcDate.withHourOfDay(utcTime.getHourOfDay()).withMinuteOfHour(utcTime.getMinuteOfHour());</span>
+<span class="fc" id="L431">            builder.setTime(time);</span>
+<span class="fc" id="L432">        } else {</span>
+<span class="nc" id="L433">            builder.setTime(null);</span>
+        }
+
+<span class="fc" id="L436">        return builder.build();</span>
+    }
+
+    protected DateTime readTimeZone(XMLStreamReader parser) throws XMLStreamException, IOException {
+<span class="fc" id="L440">        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, &quot;time_zone&quot;);</span>
+
+<span class="fc" id="L442">        String rawDate = null;</span>
+<span class="fc" id="L443">        float utcOffset = 0.0f;</span>
+
+<span class="fc bfc" id="L445" title="All 2 branches covered.">        while (parser.next() != XMLStreamReader.END_ELEMENT) {</span>
+<span class="fc bfc" id="L446" title="All 2 branches covered.">            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {</span>
+<span class="fc" id="L447">                continue;</span>
+            }
+
+            String raw;
+<span class="pc bpc" id="L451" title="4 of 10 branches missed.">            switch (parser.getLocalName()) {</span>
+                case &quot;localtime&quot;:
+<span class="fc" id="L453">                    rawDate = readTag(parser, &quot;localtime&quot;);</span>
+<span class="fc" id="L454">                    break;</span>
+                case &quot;utcOffset&quot;:
+<span class="fc" id="L456">                    utcOffset = readFloatTag(parser, &quot;utcOffset&quot;);</span>
+<span class="fc" id="L457">                    break;</span>
+            }
+        }
+
+<span class="fc" id="L461">        int hoursOffset = (int) utcOffset;</span>
+<span class="fc" id="L462">        int minutesOffset = (int) ((utcOffset - hoursOffset) * 60.0);</span>
+
+<span class="fc" id="L464">        DateTimeFormatter fmt = DateTimeFormat.forPattern(&quot;yyyy-MM-dd HH:mm&quot;).withZone(DateTimeZone.forOffsetHoursMinutes(hoursOffset, minutesOffset));</span>
+
+<span class="fc" id="L466">        return fmt.parseDateTime(rawDate);</span>
+    }
+
+    private Location readLocation(XMLStreamReader parser) throws XMLStreamException, IOException {
+<span class="fc" id="L470">        parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, &quot;request&quot;);</span>
+
+<span class="fc" id="L472">        Location.Builder builder = new Location.Builder();</span>
+
+<span class="fc bfc" id="L474" title="All 2 branches covered.">        while (parser.next() != XMLStreamReader.END_ELEMENT) {</span>
+<span class="fc bfc" id="L475" title="All 2 branches covered.">            if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {</span>
+<span class="fc" id="L476">                continue;</span>
+            }
+
+<span class="pc bpc" id="L479" title="4 of 10 branches missed.">            switch (parser.getLocalName()) {</span>
+                case &quot;type&quot;:
+<span class="fc" id="L481">                    builder.setType(readTag(parser, &quot;type&quot;));</span>
+<span class="fc" id="L482">                    break;</span>
+                case &quot;query&quot;:
+<span class="fc" id="L484">                    builder.setName(readTag(parser, &quot;query&quot;));</span>
+<span class="fc" id="L485">                    break;</span>
+            }
+        }
+
+<span class="fc" id="L489">        return builder.build();</span>
+    }
+
+    private static LocalTime readTime(String raw) throws XMLStreamException {
+<span class="fc bfc" id="L493" title="All 2 branches covered.">        if (raw.equals(&quot;0&quot;)) {</span>
+<span class="fc" id="L494">            return new LocalTime(0, 0);</span>
+        } else {
+<span class="fc" id="L496">            String hour = raw.substring(0, raw.length() - 2);</span>
+<span class="fc" id="L497">            String minute = raw.substring(raw.length() - 2);</span>
+            try {
+<span class="fc" id="L499">                return new LocalTime(Integer.parseInt(hour, 10), Integer.parseInt(minute, 10));</span>
+<span class="nc" id="L500">            } catch (NumberFormatException ex) {</span>
+<span class="nc" id="L501">                throw new XMLStreamException(&quot;Can't parse time: &quot; + ex.getMessage(), ex);</span>
+            }
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
