@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Astronomy.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Weather Fetcher</a> &gt; <a href="index.source.html" class="el_package">com.moosemorals.weather.types</a> &gt; <span class="el_source">Astronomy.java</span></div><h1>Astronomy.java</h1><pre class="source lang-java linenums">/*
+ * The MIT License
+ *
+ * Copyright 2015 osric.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the &quot;Software&quot;), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package com.moosemorals.weather.types;
+
+import org.joda.time.DateTime;
+
+/**
+ * Sunrise, Sunset, Moonrise, Moonset for a location/date pair.
+ *
+ * @author osric
+ */
+public class Astronomy {
+
+    private final DateTime sunrise;
+    private final DateTime sunset;
+    private final DateTime moonrise;
+    private final DateTime moonset;
+
+    /**
+     * Time of sunrise (with offset time zone).
+     *
+     * @return DateTime time of sunrise
+     */
+    public DateTime getSunrise() {
+<span class="nc" id="L46">        return sunrise;</span>
+    }
+
+    /**
+     * Time of sunset (with offset time zone).
+     *
+     * @return DateTime time of sunset
+     */
+    public DateTime getSunset() {
+<span class="nc" id="L55">        return sunset;</span>
+    }
+
+    /**
+     * Time of moonrise (with offset time zone). Will be null when the moon
+     * doesn't rise on the given day.
+     *
+     * @return DateTime Time of moonrise, or null if there is no moonrise
+     */
+    public DateTime getMoonrise() {
+<span class="nc" id="L65">        return moonrise;</span>
+    }
+
+    /**
+     * Time of moonset (with offset time zone). Will be null when the moon
+     * doesn't set on the given day.
+     *
+     * @return DateTime Time of moonrise, or null if there is no moonset
+     */
+    public DateTime getMoonset() {
+<span class="nc" id="L75">        return moonset;</span>
+    }
+
+<span class="fc" id="L78">    private Astronomy(DateTime sunrise, DateTime sunset, DateTime moonrise, DateTime moonset) {</span>
+<span class="fc" id="L79">        this.sunrise = sunrise;</span>
+<span class="fc" id="L80">        this.sunset = sunset;</span>
+<span class="fc" id="L81">        this.moonrise = moonrise;</span>
+<span class="fc" id="L82">        this.moonset = moonset;</span>
+<span class="fc" id="L83">    }</span>
+
+    /**
+     * Build an Astronomy data class. Not really useful to end users.
+     */
+    public static class Builder {
+
+        private DateTime sunrise;
+        private DateTime sunset;
+        private DateTime moonrise;
+        private DateTime moonset;
+
+        public Builder() {
+<span class="fc" id="L96">            super();</span>
+<span class="fc" id="L97">        }</span>
+
+        public Builder setSunrise(DateTime sunrise) {
+<span class="fc" id="L100">            this.sunrise = sunrise;</span>
+<span class="fc" id="L101">            return this;</span>
+        }
+
+        public Builder setSunset(DateTime sunset) {
+<span class="fc" id="L105">            this.sunset = sunset;</span>
+<span class="fc" id="L106">            return this;</span>
+        }
+
+        public Builder setMoonrise(DateTime moonrise) {
+<span class="fc" id="L110">            this.moonrise = moonrise;</span>
+<span class="fc" id="L111">            return this;</span>
+        }
+
+        public Builder setMoonset(DateTime moonset) {
+<span class="fc" id="L115">            this.moonset = moonset;</span>
+<span class="fc" id="L116">            return this;</span>
+        }
+
+        public Astronomy build() {
+<span class="fc" id="L120">            return new Astronomy(sunrise, sunset, moonrise, moonset);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
