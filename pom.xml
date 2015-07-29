@@ -27,11 +27,11 @@
             <timezone>Europe/London</timezone>
         </developer>
     </developers>
-    <url>https://github.com/Moosemorals/WeatherFetcher</url>
+    <url>https://github.com/Moosemorals/world-weather-fetcher</url>
     <scm>
-        <url>https://github.com/Moosemorals/WeatherFetcher</url>
-        <connection>scm:git:git@github.com:Moosemorals/WeatherFetcher.git</connection>
-        <developerConnection>scm:git:git@github.com:Moosemorals/WeatherFetcher.git</developerConnection>
+        <url>https://github.com/Moosemorals/world-weather-fetcher</url>
+        <connection>scm:git:git@github.com:Moosemorals/world-weather-fetcher.git</connection>
+        <developerConnection>scm:git:git@github.com:Moosemorals/world-weather-fetcher.git</developerConnection>
     </scm>
     <distributionManagement>
         <snapshotRepository>
