@@ -1,3 +1,7 @@
+<head>
+<title>World Weather Online API Java Fetch Library</title>
+</head>
+
 # Weather data fetch library
 
 [World Weather Online](https://www.worldweatheronline.com) provide
