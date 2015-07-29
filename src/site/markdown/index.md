@@ -41,9 +41,13 @@ does nothing to enforce those limits, but does report your usage.
         System.out.println("Sorry there was a problem: " + report.getMessage());
     }
 
-# Javadoc
+# Links
 
-[Javadoc](http://moosemorals.github.io/WeatherFetcher/apidocs/index.html) for the library.
+[Javadoc](/apidocs/index.html) for the library.
+
+[Github](https://github.com/Moosemorals/world-weather-fetcher) site to browse the source.
+
+(Comming soon: Maven co-ordinates!)
 
 # Licence
 
