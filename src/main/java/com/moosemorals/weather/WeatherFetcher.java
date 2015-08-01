@@ -59,9 +59,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
-public class Fetcher {
+public class WeatherFetcher {
 
-    private static final Logger log = LoggerFactory.getLogger(Fetcher.class);
+    private static final Logger log = LoggerFactory.getLogger(WeatherFetcher.class);
     private static final String ENDPOINT = "https://api.worldweatheronline.com/free/v2/weather.ashx";
 
     /**
@@ -80,7 +80,7 @@ public class Fetcher {
     private final boolean current;
     private final int timePeriod;
 
-    private Fetcher(String apiKey, String location, String language, CloseableHttpClient httpClient, int num_of_days, DateTime date, boolean forecast, boolean current, int timePeriod) {
+    private WeatherFetcher(String apiKey, String location, String language, CloseableHttpClient httpClient, int num_of_days, DateTime date, boolean forecast, boolean current, int timePeriod) {
         this.apiKey = apiKey;
         this.location = location;
         this.language = language;
@@ -134,11 +134,11 @@ public class Fetcher {
 
         // For logging, build the request with a hidden api key
         param.put("key", "HIDDEN");
-        String loggableTarget = Util.assembleURL(Fetcher.ENDPOINT, Util.flattenMap(param));
+        String loggableTarget = Util.assembleURL(WeatherFetcher.ENDPOINT, Util.flattenMap(param));
 
         // For live use, build the request with the real api.
         param.put("key", apiKey);
-        String target = Util.assembleURL(Fetcher.ENDPOINT, Util.flattenMap(param));
+        String target = Util.assembleURL(WeatherFetcher.ENDPOINT, Util.flattenMap(param));
 
         HttpGet request = new HttpGet(target);
 
@@ -357,8 +357,8 @@ public class Fetcher {
             return this;
         }
 
-        public Fetcher build() {
-            return new Fetcher(apiKey, location, language, httpClient, num_of_days, date, forecast, current, timePeriod);
+        public WeatherFetcher build() {
+            return new WeatherFetcher(apiKey, location, language, httpClient, num_of_days, date, forecast, current, timePeriod);
         }
     }
 

@@ -46,11 +46,11 @@ import org.testng.annotations.Test;
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
-public class FetcherIT {
+public class WeatherFetcherIT {
 
-    private final Logger log = LoggerFactory.getLogger(FetcherIT.class);
+    private final Logger log = LoggerFactory.getLogger(WeatherFetcherIT.class);
 
-    public FetcherIT() {
+    public WeatherFetcherIT() {
     }
 
     private CloseableHttpClient httpClient;
@@ -84,13 +84,13 @@ public class FetcherIT {
 
     @Test(expectedExceptions = NullPointerException.class)
     public void fetchNoParams() throws Exception {
-        FetchResult result = new Fetcher.Builder().build().fetch();
+        FetchResult result = new WeatherFetcher.Builder().build().fetch();
     }
 
     @Test
     public void basicFetch() throws Exception {
         // Fetching for Newcastle Upon Tyne, UK
-        FetchResult result = new Fetcher.Builder()
+        FetchResult result = new WeatherFetcher.Builder()
                 .setApiKey(apiKey)
                 .setLocation("NE6")
                 .build()
@@ -117,7 +117,7 @@ public class FetcherIT {
     @Test
     public void fetchNothing() throws Exception {
         // Fetching for Newcastle Upon Tyne, UK
-        FetchResult result = new Fetcher.Builder()
+        FetchResult result = new WeatherFetcher.Builder()
                 .setApiKey(apiKey)
                 .setForecast(false)
                 .setCurrent(false)
@@ -141,7 +141,7 @@ public class FetcherIT {
     @Test
     public void fetchOneDay() throws Exception {
         // Fetching for Newcastle Upon Tyne, UK
-        FetchResult result = new Fetcher.Builder()
+        FetchResult result = new WeatherFetcher.Builder()
                 .setApiKey(apiKey)
                 .setNumOfDays(1)
                 .setLocation("NE6")
@@ -165,7 +165,7 @@ public class FetcherIT {
     @Test
     public void fetch6Hours() throws Exception {
         // Fetching for Newcastle Upon Tyne, UK
-        FetchResult result = new Fetcher.Builder()
+        FetchResult result = new WeatherFetcher.Builder()
                 .setApiKey(apiKey)
                 .setFrequency(6)
                 .setLocation("NE6")
@@ -188,7 +188,7 @@ public class FetcherIT {
     @Test
     public void fetchLanguage() throws Exception {
         // Fetching for Newcastle Upon Tyne, UK
-        FetchResult result = new Fetcher.Builder()
+        FetchResult result = new WeatherFetcher.Builder()
                 .setApiKey(apiKey)
                 .setForecast(false)
                 .setCurrent(true)
@@ -215,7 +215,7 @@ public class FetcherIT {
     public void fetchError() throws Exception {
         String bogusKey = "XXXX-testing-XXXX";
 
-        FetchResult result = new Fetcher.Builder()
+        FetchResult result = new WeatherFetcher.Builder()
                 .setApiKey(bogusKey)
                 .setLocation("NE6")
                 .build()
