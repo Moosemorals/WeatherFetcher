@@ -28,6 +28,7 @@ import com.moosemorals.weather.types.DailyForecast;
 import com.moosemorals.weather.types.HourlyForecast;
 import com.moosemorals.weather.types.Query;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.joda.time.DateTime;
 
@@ -126,9 +127,7 @@ public class WeatherReport implements Report {
         }
 
         public WeatherReport build() {
-
-            return new WeatherReport(location, current, forecastDays, forecastHours, when, language);
-
+            return new WeatherReport(location, current, Collections.unmodifiableList(forecastDays), Collections.unmodifiableList(forecastHours), when, language);
         }
     }
 
