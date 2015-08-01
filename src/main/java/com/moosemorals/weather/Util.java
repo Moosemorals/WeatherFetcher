@@ -23,9 +23,18 @@
  */
 package com.moosemorals.weather;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A couple of utility methods that don't really belong to Fetcher.
@@ -33,6 +42,8 @@ import java.util.Map;
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
 public class Util {
+
+    private static final Logger log = LoggerFactory.getLogger(Util.class);
 
     /**
      * Add a query string to a URL.
@@ -78,6 +89,29 @@ public class Util {
             i += 2;
         }
         return result;
+    }
+
+    public static int getIntFromHeader(CloseableHttpResponse response, String headerName) {
+        Header firstHeader = response.getFirstHeader(headerName);
+        if (firstHeader != null) {
+            return Integer.parseInt(firstHeader.getValue(), 10);
+        } else {
+            return -1;
+        }
+    }
+
+    public static InputStream dumpInputStream(InputStream in) throws IOException {
+        if (!log.isDebugEnabled()) {
+            return in;
+        }
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        StringBuilder data = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            data.append(line).append(System.lineSeparator());
+        }
+        log.debug("Recieved File\n------\n{}\n------", data.toString());
+        return new ByteArrayInputStream(data.toString().getBytes("UTF-8"));
     }
 
 }

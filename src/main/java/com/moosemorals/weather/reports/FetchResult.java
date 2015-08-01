@@ -30,25 +30,36 @@ package com.moosemorals.weather.reports;
  */
 public class FetchResult {
 
-    private final WeatherReport report;
+    private final WeatherReport weatherReport;
+    private final LocationReport locationReport;
     private final ErrorReport error;
     private final int requestsPerSecond;
     private final int requestsPerDay;
 
-    private FetchResult(WeatherReport report, ErrorReport error, int requestsPerSecond, int requestsPerDay) {
-        this.report = report;
+    private FetchResult(WeatherReport weather, LocationReport location, ErrorReport error, int requestsPerSecond, int requestsPerDay) {
+        this.weatherReport = weather;
+        this.locationReport = location;
         this.error = error;
         this.requestsPerSecond = requestsPerSecond;
         this.requestsPerDay = requestsPerDay;
     }
 
     /**
-     * Weather report. Will be null if there was an error.
+     * Weather report.
      *
      * @return
      */
     public WeatherReport getWeather() {
-        return report;
+        return weatherReport;
+    }
+
+    /**
+     * Location report.
+     *
+     * @return
+     */
+    public LocationReport getLocation() {
+        return locationReport;
     }
 
     /**
@@ -93,7 +104,8 @@ public class FetchResult {
 
     public static class Builder {
 
-        private WeatherReport report;
+        private WeatherReport weather;
+        private LocationReport location;
         private ErrorReport error;
         private int requestsPerSecond;
         private int requestsPerDay;
@@ -103,7 +115,12 @@ public class FetchResult {
         }
 
         public Builder setWeather(WeatherReport report) {
-            this.report = report;
+            this.weather = report;
+            return this;
+        }
+
+        public Builder setLocation(LocationReport location) {
+            this.location = location;
             return this;
         }
 
@@ -123,7 +140,7 @@ public class FetchResult {
         }
 
         public FetchResult build() {
-            return new FetchResult(report, error, requestsPerSecond, requestsPerDay);
+            return new FetchResult(weather, location, error, requestsPerSecond, requestsPerDay);
         }
     }
 

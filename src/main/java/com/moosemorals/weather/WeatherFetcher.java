@@ -29,15 +29,10 @@ import com.moosemorals.weather.reports.Report;
 import com.moosemorals.weather.reports.WeatherReport;
 import com.moosemorals.weather.xml.ErrorParser;
 import com.moosemorals.weather.xml.WeatherParser;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -150,13 +145,13 @@ public class WeatherFetcher {
             log.debug("Response {}", status);
             HttpEntity body = response.getEntity();
 
-            resultBuilder.setRequestsPerSecond(getIntFromHeader(response, "x-apiaxleproxy-qps-left"));
-            resultBuilder.setRequestsPerDay(getIntFromHeader(response, "x-apiaxleproxy-qpd-left"));
+            resultBuilder.setRequestsPerSecond(Util.getIntFromHeader(response, "x-apiaxleproxy-qps-left"));
+            resultBuilder.setRequestsPerDay(Util.getIntFromHeader(response, "x-apiaxleproxy-qpd-left"));
 
             try {
                 if (status.getStatusCode() == 200) {
 
-                    Report report = new WeatherParser().parse(dumpInputStream(body.getContent()));
+                    Report report = new WeatherParser().parse(Util.dumpInputStream(body.getContent()));
                     if (report instanceof WeatherReport) {
                         resultBuilder.setWeather((WeatherReport) report);
                     } else {
@@ -176,33 +171,6 @@ public class WeatherFetcher {
         }
 
         return resultBuilder.build();
-    }
-
-    private static int getIntFromHeader(CloseableHttpResponse response, String headerName) {
-        Header firstHeader = response.getFirstHeader(headerName);
-        if (firstHeader != null) {
-            return Integer.parseInt(firstHeader.getValue(), 10);
-        } else {
-            return -1;
-        }
-    }
-
-    private static InputStream dumpInputStream(InputStream in) throws IOException {
-        if (!log.isDebugEnabled()) {
-            return in;
-        }
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-
-        StringBuilder data = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null) {
-            data.append(line).append(System.lineSeparator());
-        }
-
-        log.debug("Recieved File\n------\n{}\n------", data.toString());
-
-        return new ByteArrayInputStream(data.toString().getBytes("UTF-8"));
     }
 
     /**
