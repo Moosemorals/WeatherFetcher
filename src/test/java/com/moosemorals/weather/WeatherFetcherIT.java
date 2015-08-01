@@ -26,9 +26,6 @@ package com.moosemorals.weather;
 import com.moosemorals.weather.reports.ErrorReport;
 import com.moosemorals.weather.reports.FetchResult;
 import com.moosemorals.weather.reports.WeatherReport;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
@@ -50,9 +47,6 @@ public class WeatherFetcherIT {
 
     private final Logger log = LoggerFactory.getLogger(WeatherFetcherIT.class);
 
-    public WeatherFetcherIT() {
-    }
-
     private CloseableHttpClient httpClient;
     private String apiKey;
     private int requestsPerSecond;
@@ -61,15 +55,15 @@ public class WeatherFetcherIT {
     @BeforeClass
     public void setUpClass() throws Exception {
         httpClient = HttpClients.createDefault();
-        apiKey = loadAPIKey(getClass().getResourceAsStream("/apiKey"));
+        apiKey = TestUtils.loadAPIKey(getClass().getResourceAsStream("/apiKey"));
     }
 
     @AfterMethod
     public void afterMethod() throws Exception {
         log.info("Currently have {} requests left this second, {} requests left this day", requestsPerSecond, requestsPerDay);
         if (requestsPerSecond <= 1) {
-            log.info("Run out of requests, sleeping for a second");
-            Thread.sleep(1000);
+            log.info("Run out of requests, sleeping for two seconds");
+            Thread.sleep(2000);
         }
         if (requestsPerDay <= 1) {
             log.error("Run out of requests for today, giving up");
@@ -231,14 +225,5 @@ public class WeatherFetcherIT {
 
         assertNotNull(report.getMessage());
         assertEquals(report.getMessage(), "'" + bogusKey + "' is not a valid key.");
-    }
-
-    private static String loadAPIKey(InputStream in) throws Exception {
-        if (in == null) {
-            throw new Exception("API key not found. Copy it to /src/test/resource/apiKey and try again.");
-        }
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
-            return br.readLine();
-        }
     }
 }

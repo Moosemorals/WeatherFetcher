@@ -29,15 +29,10 @@ import com.moosemorals.weather.reports.LocationReport;
 import com.moosemorals.weather.reports.Report;
 import com.moosemorals.weather.xml.ErrorParser;
 import com.moosemorals.weather.xml.LocationParser;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -131,7 +126,6 @@ public class LocationFetcher {
 
         return resultBuilder.build();
     }
-
 
     public static class Builder {
 
