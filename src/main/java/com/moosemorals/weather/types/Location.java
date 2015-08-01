@@ -23,46 +23,107 @@
  */
 package com.moosemorals.weather.types;
 
+import org.joda.time.DateTimeZone;
+
 /**
- * Confirmation from the API of the location that was requested.
+ * Information about locations.
  *
  * @author Osric Wilkinson <osric@fluffypeople.com>
  */
 public class Location {
 
     private final String name;
-    private final String type;
+    private final String region;
+    private final String country;
+    private final long population;
+    private final DateTimeZone timezone;
+    private final float latitude;
+    private final float longitude;
 
-    private Location(String name, String type) {
+    private Location(String name, String region, String country, long population, DateTimeZone timezone, float latitude, float longitude) {
         this.name = name;
-        this.type = type;
+        this.region = region;
+        this.country = country;
+        this.population = population;
+        this.timezone = timezone;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     /**
-     * Name of the location.
+     * Name of the place.
      *
-     * @return String name of the location
+     * @return String name of the place
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Type of the location. Something like "UK Postcode" or "City".
+     * Region containing the place.
      *
-     * @return String type of location
+     * @return String name of the region containing the place.
      */
-    public String getType() {
-        return type;
+    public String getRegion() {
+        return region;
     }
 
     /**
-     * Build a new Location. Not really useful to end users.
+     * Country containing the place.
+     *
+     * @return String name of the country containing the place.
      */
+    public String getCountry() {
+        return country;
+    }
+
+    /**
+     * Population of the place. Not sure how current this info is. </p>
+     *
+     * Zero is used to show no data.
+     *
+     * @return long population of the place.
+     */
+    public long getPopulation() {
+        return population;
+    }
+
+    /**
+     * Offset from UTC of the place, <em>at the time of the query</em>. </p>
+     *
+     * @return DateTimeZone holding offset from UTC in hours
+     */
+    public DateTimeZone getTimezone() {
+        return timezone;
+    }
+
+    /**
+     * Latitude of the place, in decimal degrees. North is positive.
+     *
+     * @return float latitude of the place
+     */
+    public float getLatitude() {
+        return latitude;
+    }
+
+    /**
+     * Longitude of the place, in decimal degrees. West is positive.
+     *
+     * @return float longitude of the place.
+     */
+    public float getLongitude() {
+        return longitude;
+    }
+
     public static class Builder {
 
         private String name;
-        private String type;
+        private String region;
+        private String country;
+        private long population;
+        private DateTimeZone timezone;
+        private float latitude;
+        private float longitude;
 
         public Builder() {
             super();
@@ -73,13 +134,38 @@ public class Location {
             return this;
         }
 
-        public Builder setType(String type) {
-            this.type = type;
+        public Builder setRegion(String region) {
+            this.region = region;
+            return this;
+        }
+
+        public Builder setCountry(String country) {
+            this.country = country;
+            return this;
+        }
+
+        public Builder setPopulation(long population) {
+            this.population = population;
+            return this;
+        }
+
+        public Builder setTimezone(DateTimeZone timezone) {
+            this.timezone = timezone;
+            return this;
+        }
+
+        public Builder setLatitude(float latitude) {
+            this.latitude = latitude;
+            return this;
+        }
+
+        public Builder setLongitude(float longitude) {
+            this.longitude = longitude;
             return this;
         }
 
         public Location build() {
-            return new Location(name, type);
+            return new Location(name, region, country, population, timezone, latitude, longitude);
         }
     }
 

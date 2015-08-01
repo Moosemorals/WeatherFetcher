@@ -26,7 +26,7 @@ package com.moosemorals.weather.reports;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.DailyForecast;
 import com.moosemorals.weather.types.HourlyForecast;
-import com.moosemorals.weather.types.Location;
+import com.moosemorals.weather.types.Query;
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTime;
@@ -38,14 +38,14 @@ import org.joda.time.DateTime;
  */
 public class WeatherReport implements Report {
 
-    private final Location location;
+    private final Query location;
     private final Current current;
     private final List<DailyForecast> forecastDays;
     private final List<HourlyForecast> forecastHours;
     private final DateTime when;
     private final String language;
 
-    private WeatherReport(Location location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, String language) {
+    private WeatherReport(Query location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, String language) {
         this.location = location;
         this.current = current;
         this.forecastDays = forecastDays;
@@ -54,7 +54,7 @@ public class WeatherReport implements Report {
         this.language = language;
     }
 
-    public Location getLocation() {
+    public Query getLocation() {
         return location;
     }
 
@@ -83,7 +83,7 @@ public class WeatherReport implements Report {
      */
     public static class Builder {
 
-        private Location location;
+        private Query location;
         private Current current;
         private final List<DailyForecast> forecastDays;
         private final List<HourlyForecast> forecastHours;
@@ -95,7 +95,7 @@ public class WeatherReport implements Report {
             forecastHours = new ArrayList<>();
         }
 
-        public Builder setLocation(Location location) {
+        public Builder setLocation(Query location) {
             this.location = location;
             return this;
         }

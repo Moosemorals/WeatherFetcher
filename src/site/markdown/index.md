@@ -43,7 +43,7 @@ does nothing to enforce those limits, but does report your usage.
 
 # Links
 
-[Javadoc](/apidocs/index.html) for the library.
+[Javadoc](apidocs/index.html) for the library.
 
 [Github](https://github.com/Moosemorals/world-weather-fetcher) site to browse the source.
 

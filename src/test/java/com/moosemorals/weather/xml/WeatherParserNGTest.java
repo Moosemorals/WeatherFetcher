@@ -30,7 +30,7 @@ import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.DailyForecast;
 import com.moosemorals.weather.types.HourlyForecast;
-import com.moosemorals.weather.types.Location;
+import com.moosemorals.weather.types.Query;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -62,10 +62,10 @@ public class WeatherParserNGTest {
     public void basics() throws Exception {
         Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
 
+        assertNotNull(raw);
         assertTrue(raw instanceof WeatherReport);
         WeatherReport report = (WeatherReport) raw;
 
-        assertNotNull(report);
         assertNotNull(report.getCurrent());
         assertEquals(report.getDailyForecasts().size(), 5);
         DateTime when = new DateTime(2015, 7, 25, 11, 01, 0, DateTimeZone.forOffsetHours(1));
@@ -100,7 +100,7 @@ public class WeatherParserNGTest {
         assertTrue(raw instanceof WeatherReport);
         WeatherReport report = (WeatherReport) raw;
 
-        Location location = report.getLocation();
+        Query location = report.getLocation();
         assertNotNull(location);
         assertEquals(location.getType(), "UK Postcode");
         assertEquals(location.getName(), "NE6");

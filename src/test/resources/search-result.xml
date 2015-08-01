@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<search_api>
+    <result>
+        <areaName>
+            <![CDATA[Byker]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.974</latitude>
+        <longitude>-1.572</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9744,-1.5719]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[Walkergate]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.983</latitude>
+        <longitude>-1.556</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9833,-1.5562]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[St Peter's]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.965</latitude>
+        <longitude>-1.572</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9654,-1.572]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[Felling Shore]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.965</latitude>
+        <longitude>-1.572</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9654,-1.572]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[St Anthony's]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.965</latitude>
+        <longitude>-1.556</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9653,-1.5564]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[Walker]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.974</latitude>
+        <longitude>-1.541</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9742,-1.5407]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[Heaton]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.992</latitude>
+        <longitude>-1.572</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9923,-1.5717]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[East Gateshead]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.965</latitude>
+        <longitude>-1.588</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9654,-1.5876]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[Wallsend]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.992</latitude>
+        <longitude>-1.541</longitude>
+        <population>42739</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9922,-1.5405]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+    <result>
+        <areaName>
+            <![CDATA[Old Fold]]>
+        </areaName>
+        <country>
+            <![CDATA[United Kingdom]]>
+        </country>
+        <region>
+            <![CDATA[Tyne and Wear]]>
+        </region>
+        <latitude>54.956</latitude>
+        <longitude>-1.572</longitude>
+        <population>0</population>
+        <weatherUrl>
+            <![CDATA[http://www.worldweatheronline.com/v2/weather.aspx?q=54.9564,-1.5721]]>
+        </weatherUrl>
+        <timezone>
+            <offset>1.0</offset>
+        </timezone>
+    </result>
+</search_api>

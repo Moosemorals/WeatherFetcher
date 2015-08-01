@@ -30,7 +30,7 @@ import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.DailyForecast;
 import com.moosemorals.weather.types.HourlyForecast;
-import com.moosemorals.weather.types.Location;
+import com.moosemorals.weather.types.Query;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -466,10 +466,10 @@ public class WeatherParser extends BaseParser<Report> {
         return fmt.parseDateTime(rawDate);
     }
 
-    private Location readLocation(XMLStreamReader parser) throws XMLStreamException, IOException {
+    private Query readLocation(XMLStreamReader parser) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "request");
 
-        Location.Builder builder = new Location.Builder();
+        Query.Builder builder = new Query.Builder();
 
         while (parser.next() != XMLStreamReader.END_ELEMENT) {
             if (parser.getEventType() != XMLStreamReader.START_ELEMENT) {
