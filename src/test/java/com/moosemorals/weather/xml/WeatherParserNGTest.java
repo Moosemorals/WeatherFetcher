@@ -30,6 +30,7 @@ import com.moosemorals.weather.types.Astronomy;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.DailyForecast;
 import com.moosemorals.weather.types.HourlyForecast;
+import com.moosemorals.weather.types.Location;
 import com.moosemorals.weather.types.Query;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -94,16 +95,34 @@ public class WeatherParserNGTest {
     }
 
     @Test
-    public void location() throws Exception {
+    public void query() throws Exception {
         Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-utc.xml"));
 
         assertTrue(raw instanceof WeatherReport);
         WeatherReport report = (WeatherReport) raw;
 
-        Query location = report.getLocation();
+        Query query = report.getQuery();
+        assertNotNull(query);
+        assertEquals(query.getType(), "UK Postcode");
+        assertEquals(query.getName(), "NE6");
+    }
+
+    @Test
+    public void location() throws Exception {
+        Report raw = new WeatherParser().parse(getClass().getResourceAsStream("/sample-just-location.xml"));
+
+        assertTrue(raw instanceof WeatherReport);
+        WeatherReport report = (WeatherReport) raw;
+
+        Location location = report.getLocation();
         assertNotNull(location);
-        assertEquals(location.getType(), "UK Postcode");
-        assertEquals(location.getName(), "NE6");
+
+        assertEquals(location.getName(), "Newcastle-upon-Tyne");
+        assertEquals(location.getRegion(), "Tyne And Wear");
+        assertEquals(location.getCountry(), "UK");
+        assertEquals(location.getLatitude(), 54.977, 0.0001);
+        assertEquals(location.getLongitude(), -1.564, 0.0001);
+        assertEquals(location.getTimezone(), null);
     }
 
     @Test

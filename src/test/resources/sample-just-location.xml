@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+    <request>
+        <type>UK Postcode</type>
+        <query>NE6</query>
+    </request>
+    <nearest_area>
+        <areaName>
+            <![CDATA[Newcastle-upon-Tyne]]>
+        </areaName>
+        <country>
+            <![CDATA[UK]]>
+        </country>
+        <region>
+            <![CDATA[Tyne And Wear]]>
+        </region>
+        <latitude>54.977</latitude>
+        <longitude>-1.564</longitude>
+    </nearest_area>
+</data>

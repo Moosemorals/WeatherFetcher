@@ -83,9 +83,10 @@ public class Util {
     public static String[] flattenMap(Map<String, String> map) {
         String[] result = new String[map.size() * 2];
         int i = 0;
-        for (String key : map.keySet()) {
-            result[i] = key;
-            result[i + 1] = map.get(key);
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            result[i] = entry.getKey();
+            result[i + 1] = entry.getValue();
             i += 2;
         }
         return result;

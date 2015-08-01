@@ -69,7 +69,10 @@ public class WeatherParser extends BaseParser<Report> {
                 case "error":
                     return readError(parser);
                 case "request":
-                    builder.setLocation(readLocation(parser));
+                    builder.setQuery(readQuery(parser));
+                    break;
+                case "nearest_area":
+                    builder.setLocation(new LocationParser().readLocation(parser, "nearest_area"));
                     break;
                 case "time_zone":
                     when = readTimeZone(parser);
@@ -466,7 +469,7 @@ public class WeatherParser extends BaseParser<Report> {
         return fmt.parseDateTime(rawDate);
     }
 
-    private Query readLocation(XMLStreamReader parser) throws XMLStreamException, IOException {
+    private Query readQuery(XMLStreamReader parser) throws XMLStreamException, IOException {
         parser.require(XMLStreamReader.START_ELEMENT, NAMESPACE, "request");
 
         Query.Builder builder = new Query.Builder();

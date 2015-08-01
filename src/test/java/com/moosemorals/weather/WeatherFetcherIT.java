@@ -99,6 +99,10 @@ public class WeatherFetcherIT {
         WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
+        assertEquals(report.getLanguage(), "en", "Language should be en (English)");
+        assertNotNull(report.getLocation(), "Location should not be null");
+        assertNotNull(report.getQuery(), "Query should not be null");
+        assertNotNull(report.getDate(), "Date should not be null");
         assertEquals(report.getDailyForecasts().size(), 3, "Should have 3 daily forecasts");
         assertEquals(report.getHourlyForecasts().size(), 8 * 3, "Should have 8 reports/day for 3 days");
 
@@ -128,6 +132,11 @@ public class WeatherFetcherIT {
         WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
         assertEquals(report.getCurrent(), null, "Current should be null");
+        assertEquals(report.getLanguage(), "en", "Language should be en (English)");
+        assertNotNull(report.getLocation(), "Location should not be null");
+        assertNotNull(report.getQuery(), "Query should not be null");
+        assertNotNull(report.getDate(), "Date should not be null");
+
         assertTrue(report.getDailyForecasts().isEmpty(), "Should have no daily forecast");
         assertTrue(report.getHourlyForecasts().isEmpty(), "Should have no hourly forecast");
     }
@@ -150,7 +159,12 @@ public class WeatherFetcherIT {
 
         WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
+        assertEquals(report.getLanguage(), "en", "Language should be en (English)");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
+        assertNotNull(report.getLocation(), "Location should not be null");
+        assertNotNull(report.getQuery(), "Query should not be null");
+        assertNotNull(report.getDate(), "Date should not be null");
+
         assertEquals(report.getDailyForecasts().size(), 1, "Should have 1 daily forecasts");
         assertEquals(report.getHourlyForecasts().size(), 8 * 1, "Should have 8 reports/day for 1 day");
 
@@ -174,7 +188,12 @@ public class WeatherFetcherIT {
 
         WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
+        assertEquals(report.getLanguage(), "en", "Language should be en (English)");
         assertNotNull(report.getCurrent(), "Current conditions should not be null");
+        assertNotNull(report.getLocation(), "Location should not be null");
+        assertNotNull(report.getQuery(), "Query should not be null");
+        assertNotNull(report.getDate(), "Date should not be null");
+
         assertEquals(report.getDailyForecasts().size(), 3, "Should have 3 daily forecasts");
         assertEquals(report.getHourlyForecasts().size(), 4 * 3, "Should have 4 reports/day for 3 days");
     }
@@ -200,6 +219,10 @@ public class WeatherFetcherIT {
         WeatherReport report = result.getWeather();
         assertNotNull(report, "Report should not be null");
         assertNotNull(report.getCurrent(), "Current should not be null");
+        assertNotNull(report.getLocation(), "Location should not be null");
+        assertNotNull(report.getQuery(), "Query should not be null");
+        assertNotNull(report.getDate(), "Date should not be null");
+
         assertEquals(report.getLanguage(), "uk", "Language should be uk (Ukranian)");
         assertTrue(report.getDailyForecasts().isEmpty(), "Should have no daily forecast");
         assertTrue(report.getHourlyForecasts().isEmpty(), "Should have no hourly forecast");

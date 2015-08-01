@@ -114,15 +114,20 @@ public class WeatherFetcher {
         param.put("tp", Integer.toString(timePeriod));
         param.put("format", "xml");
         param.put("showlocaltime", "yes");
+        param.put("includelocation", "yes");
+
         if (date != null) {
             param.put("date", DateTimeFormat.forPattern("yyyy-MM-dd").print(date));
         }
+
         if (language != null) {
             param.put("lang", language);
         }
+
         if (!forecast) {
             param.put("fx", "no");
         }
+
         if (!current) {
             param.put("cc", "no");
         }

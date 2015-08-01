@@ -26,6 +26,7 @@ package com.moosemorals.weather.reports;
 import com.moosemorals.weather.types.Current;
 import com.moosemorals.weather.types.DailyForecast;
 import com.moosemorals.weather.types.HourlyForecast;
+import com.moosemorals.weather.types.Location;
 import com.moosemorals.weather.types.Query;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,14 +40,16 @@ import org.joda.time.DateTime;
  */
 public class WeatherReport implements Report {
 
-    private final Query location;
+    private final Query query;
+    private final Location location;
     private final Current current;
     private final List<DailyForecast> forecastDays;
     private final List<HourlyForecast> forecastHours;
     private final DateTime when;
     private final String language;
 
-    private WeatherReport(Query location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, String language) {
+    private WeatherReport(Query query, Location location, Current current, List<DailyForecast> forecastDays, List<HourlyForecast> forecastHours, DateTime when, String language) {
+        this.query = query;
         this.location = location;
         this.current = current;
         this.forecastDays = forecastDays;
@@ -55,14 +58,38 @@ public class WeatherReport implements Report {
         this.language = language;
     }
 
-    public Query getLocation() {
+    /**
+     * The search terms used, as reported by the API.
+     *
+     * @return Query showing search terms used
+     */
+    public Query getQuery() {
+        return query;
+    }
+
+    /**
+     * Where the weather report is for.
+     *
+     * @return Location for weather report
+     */
+    public Location getLocation() {
         return location;
     }
 
+    /**
+     * Current weather. Will be null if not requested on the API call.
+     *
+     * @return Current current weather
+     */
     public Current getCurrent() {
         return current;
     }
 
+    /**
+     * Daily forecasts.
+     *
+     * @return unmodifiable List of DailyForecast
+     */
     public List<DailyForecast> getDailyForecasts() {
         return forecastDays;
     }
@@ -71,10 +98,20 @@ public class WeatherReport implements Report {
         return forecastHours;
     }
 
+    /**
+     * Local time of the location, based on server time.
+     *
+     * @return DateTime Current server time, with time zone offset to location
+     */
     public DateTime getDate() {
         return when;
     }
 
+    /**
+     * Language of report.
+     *
+     * @return String ISO language code
+     */
     public String getLanguage() {
         return language;
     }
@@ -84,8 +121,9 @@ public class WeatherReport implements Report {
      */
     public static class Builder {
 
-        private Query location;
+        private Query query;
         private Current current;
+        private Location location;
         private final List<DailyForecast> forecastDays;
         private final List<HourlyForecast> forecastHours;
         private DateTime when;
@@ -96,7 +134,12 @@ public class WeatherReport implements Report {
             forecastHours = new ArrayList<>();
         }
 
-        public Builder setLocation(Query location) {
+        public Builder setQuery(Query query) {
+            this.query = query;
+            return this;
+        }
+
+        public Builder setLocation(Location location) {
             this.location = location;
             return this;
         }
@@ -127,7 +170,7 @@ public class WeatherReport implements Report {
         }
 
         public WeatherReport build() {
-            return new WeatherReport(location, current, Collections.unmodifiableList(forecastDays), Collections.unmodifiableList(forecastHours), when, language);
+            return new WeatherReport(query, location, current, Collections.unmodifiableList(forecastDays), Collections.unmodifiableList(forecastHours), when, language);
         }
     }
 
