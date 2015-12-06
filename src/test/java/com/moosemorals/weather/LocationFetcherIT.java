@@ -26,8 +26,6 @@ package com.moosemorals.weather;
 import com.moosemorals.weather.reports.FetchResult;
 import com.moosemorals.weather.reports.LocationReport;
 import com.moosemorals.weather.types.Location;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -48,7 +46,6 @@ public class LocationFetcherIT {
 
     private final Logger log = LoggerFactory.getLogger(WeatherFetcherIT.class);
 
-    private CloseableHttpClient httpClient;
     private String apiKey;
     private int requestsPerSecond;
     private int requestsPerDay;
@@ -57,7 +54,6 @@ public class LocationFetcherIT {
     public void basics() throws Exception {
         FetchResult result = new LocationFetcher.Builder()
                 .setApiKey(apiKey)
-                .setHttpClient(httpClient)
                 .setQuery("NE6")
                 .build()
                 .fetch();
@@ -92,7 +88,6 @@ public class LocationFetcherIT {
 
     @BeforeClass
     public void setUpClass() throws Exception {
-        httpClient = HttpClients.createDefault();
         apiKey = TestUtils.loadAPIKey(getClass().getResourceAsStream("/apiKey"));
     }
 
@@ -111,7 +106,7 @@ public class LocationFetcherIT {
 
     @AfterClass
     public void tearDownClass() throws Exception {
-        httpClient.close();
+
     }
 
 }

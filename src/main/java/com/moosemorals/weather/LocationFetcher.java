@@ -30,16 +30,11 @@ import com.moosemorals.weather.reports.Report;
 import com.moosemorals.weather.xml.ErrorParser;
 import com.moosemorals.weather.xml.LocationParser;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,13 +49,12 @@ public class LocationFetcher {
     private final static Logger log = LoggerFactory.getLogger(LocationFetcher.class);
     private final String apiKey;
     private final String query;
-    private final CloseableHttpClient httpClient;
+
     private final int numResults;
 
-    public LocationFetcher(String apiKey, String query, CloseableHttpClient httpClient, int numResults) {
+    public LocationFetcher(String apiKey, String query, int numResults) {
         this.apiKey = apiKey;
         this.query = query;
-        this.httpClient = httpClient;
         this.numResults = numResults;
     }
 
@@ -87,37 +81,34 @@ public class LocationFetcher {
 
         // For live use, build the request with the real api.
         param.put("key", apiKey);
-        String target = Util.assembleURL(ENDPOINT, Util.flattenMap(param));
-
-        HttpGet request = new HttpGet(target);
+        URL target = new URL(Util.assembleURL(ENDPOINT, Util.flattenMap(param)));
 
         FetchResult.Builder resultBuilder = new FetchResult.Builder();
 
         log.debug("Fetching URL {}", loggableTarget);
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
-            StatusLine status = response.getStatusLine();
+
+        HttpURLConnection conn = (HttpURLConnection) target.openConnection();
+
+        try {
+            conn.connect();
+            int status = conn.getResponseCode();
             log.debug("Response {}", status);
-            HttpEntity body = response.getEntity();
 
-            resultBuilder.setRequestsPerSecond(Util.getIntFromHeader(response, "x-apiaxleproxy-qps-left"));
-            resultBuilder.setRequestsPerDay(Util.getIntFromHeader(response, "x-apiaxleproxy-qpd-left"));
+            resultBuilder.setRequestsPerSecond(Util.getIntFromHeader(conn, "x-apiaxleproxy-qps-left"));
+            resultBuilder.setRequestsPerDay(Util.getIntFromHeader(conn, "x-apiaxleproxy-qpd-left"));
 
-            try {
-                if (status.getStatusCode() == 200) {
+            if (status == 200) {
 
-                    Report report = new LocationParser().parse(Util.dumpInputStream(body.getContent()));
-                    if (report instanceof LocationReport) {
-                        resultBuilder.setLocation((LocationReport) report);
-                    } else {
-                        resultBuilder.setError((ErrorReport) report);
-                    }
-
+                Report report = new LocationParser().parse(conn.getInputStream());
+                if (report instanceof LocationReport) {
+                    resultBuilder.setLocation((LocationReport) report);
                 } else {
-                    ErrorReport error = new ErrorParser().parse(body.getContent());
-                    resultBuilder.setError(error);
+                    resultBuilder.setError((ErrorReport) report);
                 }
-            } finally {
-                EntityUtils.consume(body);
+
+            } else {
+                ErrorReport error = new ErrorParser().parse(conn.getErrorStream());
+                resultBuilder.setError(error);
             }
 
         } catch (XMLStreamException ex) {
@@ -131,7 +122,6 @@ public class LocationFetcher {
 
         private String apiKey;
         private String query;
-        private CloseableHttpClient httpClient = HttpClients.createDefault();
         private int numResults;
 
         public Builder() {
@@ -148,18 +138,13 @@ public class LocationFetcher {
             return this;
         }
 
-        public Builder setHttpClient(CloseableHttpClient httpClient) {
-            this.httpClient = httpClient;
-            return this;
-        }
-
         public Builder setNumResults(int numResults) {
             this.numResults = numResults;
             return this;
         }
 
         public LocationFetcher build() {
-            return new LocationFetcher(apiKey, query, httpClient, numResults);
+            return new LocationFetcher(apiKey, query, numResults);
         }
     }
 

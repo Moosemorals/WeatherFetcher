@@ -29,10 +29,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.Map;
-import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,13 +91,8 @@ public class Util {
         return result;
     }
 
-    public static int getIntFromHeader(CloseableHttpResponse response, String headerName) {
-        Header firstHeader = response.getFirstHeader(headerName);
-        if (firstHeader != null) {
-            return Integer.parseInt(firstHeader.getValue(), 10);
-        } else {
-            return -1;
-        }
+    public static int getIntFromHeader(HttpURLConnection connection, String headerName) {
+        return connection.getHeaderFieldInt(headerName, -1);
     }
 
     public static InputStream dumpInputStream(InputStream in) throws IOException {

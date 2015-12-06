@@ -26,8 +26,6 @@ package com.moosemorals.weather;
 import com.moosemorals.weather.reports.ErrorReport;
 import com.moosemorals.weather.reports.FetchResult;
 import com.moosemorals.weather.reports.WeatherReport;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.testng.Assert.assertEquals;
@@ -47,14 +45,12 @@ public class WeatherFetcherIT {
 
     private final Logger log = LoggerFactory.getLogger(WeatherFetcherIT.class);
 
-    private CloseableHttpClient httpClient;
     private String apiKey;
     private int requestsPerSecond;
     private int requestsPerDay;
 
     @BeforeClass
     public void setUpClass() throws Exception {
-        httpClient = HttpClients.createDefault();
         apiKey = TestUtils.loadAPIKey(getClass().getResourceAsStream("/apiKey"));
     }
 
@@ -73,7 +69,6 @@ public class WeatherFetcherIT {
 
     @AfterClass
     public void tearDownClass() throws Exception {
-        httpClient.close();
     }
 
     @Test(expectedExceptions = NullPointerException.class)

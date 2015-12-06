@@ -30,16 +30,11 @@ import com.moosemorals.weather.reports.WeatherReport;
 import com.moosemorals.weather.xml.ErrorParser;
 import com.moosemorals.weather.xml.WeatherParser;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -68,18 +63,17 @@ public class WeatherFetcher {
     private final String apiKey;
     private final String location;
     private final String language;
-    private final CloseableHttpClient httpClient;
     private final int num_of_days;
     private final DateTime date;
     private final boolean forecast;
     private final boolean current;
     private final int timePeriod;
 
-    private WeatherFetcher(String apiKey, String location, String language, CloseableHttpClient httpClient, int num_of_days, DateTime date, boolean forecast, boolean current, int timePeriod) {
+    private WeatherFetcher(String apiKey, String location, String language, int num_of_days, DateTime date, boolean forecast, boolean current, int timePeriod) {
         this.apiKey = apiKey;
         this.location = location;
         this.language = language;
-        this.httpClient = httpClient;
+
         this.num_of_days = num_of_days;
         this.date = date;
         this.forecast = forecast;
@@ -138,37 +132,33 @@ public class WeatherFetcher {
 
         // For live use, build the request with the real api.
         param.put("key", apiKey);
-        String target = Util.assembleURL(WeatherFetcher.ENDPOINT, Util.flattenMap(param));
-
-        HttpGet request = new HttpGet(target);
+        URL target = new URL(Util.assembleURL(WeatherFetcher.ENDPOINT, Util.flattenMap(param)));
 
         FetchResult.Builder resultBuilder = new FetchResult.Builder();
 
         log.debug("Fetching URL {}", loggableTarget);
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
-            StatusLine status = response.getStatusLine();
+        HttpURLConnection conn = (HttpURLConnection) target.openConnection();
+
+        try {
+            conn.connect();
+            int status = conn.getResponseCode();
             log.debug("Response {}", status);
-            HttpEntity body = response.getEntity();
 
-            resultBuilder.setRequestsPerSecond(Util.getIntFromHeader(response, "x-apiaxleproxy-qps-left"));
-            resultBuilder.setRequestsPerDay(Util.getIntFromHeader(response, "x-apiaxleproxy-qpd-left"));
+            resultBuilder.setRequestsPerSecond(Util.getIntFromHeader(conn, "x-apiaxleproxy-qps-left"));
+            resultBuilder.setRequestsPerDay(Util.getIntFromHeader(conn, "x-apiaxleproxy-qpd-left"));
 
-            try {
-                if (status.getStatusCode() == 200) {
+            if (status == 200) {
 
-                    Report report = new WeatherParser().parse(Util.dumpInputStream(body.getContent()));
-                    if (report instanceof WeatherReport) {
-                        resultBuilder.setWeather((WeatherReport) report);
-                    } else {
-                        resultBuilder.setError((ErrorReport) report);
-                    }
-
+                Report report = new WeatherParser().parse(conn.getInputStream());
+                if (report instanceof WeatherReport) {
+                    resultBuilder.setWeather((WeatherReport) report);
                 } else {
-                    ErrorReport error = new ErrorParser().parse(body.getContent());
-                    resultBuilder.setError(error);
+                    resultBuilder.setError((ErrorReport) report);
                 }
-            } finally {
-                EntityUtils.consume(body);
+
+            } else {
+                ErrorReport error = new ErrorParser().parse(conn.getErrorStream());
+                resultBuilder.setError(error);
             }
 
         } catch (XMLStreamException ex) {
@@ -186,7 +176,6 @@ public class WeatherFetcher {
         private String apiKey;
         private String location;
         private String language;
-        private CloseableHttpClient httpClient = HttpClients.createDefault();
         private int num_of_days = 3;
         private DateTime date = null;
         private boolean forecast = true;
@@ -243,21 +232,6 @@ public class WeatherFetcher {
          */
         public Builder setLanguage(String language) {
             this.language = language;
-            return this;
-        }
-
-        /**
-         * HttpClient to use to fetch. Optional, default
-         * HttpClients.getDefault(). </p>
-         *
-         * Provide your own client to manage e.g. cookies, certificates or
-         * caching.
-         *
-         * @param httpClient CloseableHttpClient to use to connect to the API
-         * @return this Builder for chaining.
-         */
-        public Builder setHttpClient(CloseableHttpClient httpClient) {
-            this.httpClient = httpClient;
             return this;
         }
 
@@ -331,7 +305,7 @@ public class WeatherFetcher {
         }
 
         public WeatherFetcher build() {
-            return new WeatherFetcher(apiKey, location, language, httpClient, num_of_days, date, forecast, current, timePeriod);
+            return new WeatherFetcher(apiKey, location, language, num_of_days, date, forecast, current, timePeriod);
         }
     }
 
