@@ -71,4 +71,18 @@ public class ErrorReport implements Report {
         return cause;
     }
 
+    
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("Type [")
+                .append(type)
+                .append("] cause [")
+                .append(cause)
+                .append("] message [")
+                .append(message)
+                .append("]")
+                .toString();    
+    }
+    
 }

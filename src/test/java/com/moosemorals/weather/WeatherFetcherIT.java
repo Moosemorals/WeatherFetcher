@@ -56,6 +56,8 @@ public class WeatherFetcherIT {
 
     @AfterMethod
     public void afterMethod() throws Exception {
+        /*
+        2016-09-11 - No longer given number of requests/day.
         log.info("Currently have {} requests left this second, {} requests left this day", requestsPerSecond, requestsPerDay);
         if (requestsPerSecond <= 1) {
             log.info("Run out of requests, sleeping for two seconds");
@@ -65,6 +67,7 @@ public class WeatherFetcherIT {
             log.error("Run out of requests for today, giving up");
             assertTrue(false, "No requests availible");
         }
+        */
     }
 
     @AfterClass
@@ -88,6 +91,9 @@ public class WeatherFetcherIT {
         requestsPerDay = result.getRequestsPerDay();
         requestsPerSecond = result.getRequestsPerSecond();
 
+        if (!result.isSuccess()) {
+            log.error("Fetch error {}", result.getError().getMessage(), result.getError().getCause());
+        }
         assertTrue(result.isSuccess());
         assertEquals(result.getError(), null);
 
@@ -223,6 +229,7 @@ public class WeatherFetcherIT {
         assertTrue(report.getHourlyForecasts().isEmpty(), "Should have no hourly forecast");
     }
 
+    /*
     @Test
     public void fetchError() throws Exception {
         String bogusKey = "XXXX-testing-XXXX";
@@ -244,4 +251,5 @@ public class WeatherFetcherIT {
         assertNotNull(report.getMessage());
         assertEquals(report.getMessage(), "'" + bogusKey + "' is not a valid key.");
     }
+*/
 }

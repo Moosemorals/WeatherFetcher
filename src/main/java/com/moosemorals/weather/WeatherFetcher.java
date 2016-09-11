@@ -156,8 +156,8 @@ public class WeatherFetcher {
                     resultBuilder.setError((ErrorReport) report);
                 }
 
-            } else {
-                ErrorReport error = new ErrorParser().parse(conn.getErrorStream());
+            } else {                
+                ErrorReport error  = new ErrorReport("Donwload Failure", conn.getResponseMessage());
                 resultBuilder.setError(error);
             }
 
